@@ -9,7 +9,7 @@
 // https://git.musl-libc.org/cgit/musl/tree/src/math/exp2f.c
 // https://git.musl-libc.org/cgit/musl/tree/src/math/exp2.c
 
-const std = @import("../std.zig");
+const std = @import("std");
 const math = std.math;
 const expect = std.testing.expect;
 
@@ -83,13 +83,15 @@ fn exp2_32(x: f32) f32 {
         return 1.0 + x;
     }
 
+    // NOTE: musl relies on unsafe behaviours which are replicated below
+    // (addition/bit-shift overflow). Appears that this produces the
+    // intended result but should confirm how GCC/Clang handle this to ensure.
+
     var uf = x + redux;
     var i_0 = @bitCast(u32, uf);
-    i_0 += tblsiz / 2;
+    _ = @addWithOverflow(u32, i_0, tblsiz / 2, &i_0);
 
     const k = i_0 / tblsiz;
-    // NOTE: musl relies on undefined overflow shift behaviour. Appears that this produces the
-    // intended result but should confirm how GCC/Clang handle this to ensure.
     const uk = @bitCast(f64, @as(u64, 0x3FF + k) << 52);
     i_0 &= tblsiz - 1;
     uf -= redux;
@@ -362,7 +364,7 @@ const exp2dt = [_]f64{
 };
 
 fn exp2_64(x: f64) f64 {
-    const tblsiz = @intCast(u32, exp2dt.len / 2);
+    const tblsiz: u32 = @intCast(u32, exp2dt.len / 2);
     const redux: f64 = 0x1.8p52 / @intToFloat(f64, tblsiz);
     const P1: f64 = 0x1.62e42fefa39efp-1;
     const P2: f64 = 0x1.ebfbdff82c575p-3;
@@ -405,22 +407,27 @@ fn exp2_64(x: f64) f64 {
         return 1.0 + x;
     }
 
+    // NOTE: musl relies on unsafe behaviours which are replicated below
+    // (addition overflow, division truncation, casting). Appears that this
+    // produces the intended result but should confirm how GCC/Clang handle this
+    // to ensure.
+
     // reduce x
-    var uf = x + redux;
+    var uf: f64 = x + redux;
     // NOTE: musl performs an implicit 64-bit to 32-bit u32 truncation here
-    var i_0 = @truncate(u32, @bitCast(u64, uf));
-    i_0 += tblsiz / 2;
+    var i_0: u32 = @truncate(u32, @bitCast(u64, uf));
+    _ = @addWithOverflow(u32, i_0, tblsiz / 2, &i_0);
 
     const k: u32 = i_0 / tblsiz * tblsiz;
-    const ik = @bitCast(i32, k / tblsiz);
+    const ik: i32 = @divTrunc(@bitCast(i32, k), tblsiz);
     i_0 %= tblsiz;
     uf -= redux;
 
     // r = exp2(y) = exp2t[i_0] * p(z - eps[i])
-    var z = x - uf;
-    const t = exp2dt[@intCast(usize, 2 * i_0)];
+    var z: f64 = x - uf;
+    const t: f64 = exp2dt[@intCast(usize, 2 * i_0)];
     z -= exp2dt[@intCast(usize, 2 * i_0 + 1)];
-    const r = t + t * z * (P1 + z * (P2 + z * (P3 + z * (P4 + z * P5))));
+    const r: f64 = t + t * z * (P1 + z * (P2 + z * (P3 + z * (P4 + z * P5))));
 
     return math.scalbn(r, ik);
 }
@@ -438,6 +445,7 @@ test "math.exp2_32" {
     try expect(math.approxEqAbs(f32, exp2_32(0.8923), 1.856133, epsilon));
     try expect(math.approxEqAbs(f32, exp2_32(1.5), 2.828427, epsilon));
     try expect(math.approxEqAbs(f32, exp2_32(37.45), 187747237888, epsilon));
+    try expect(math.approxEqAbs(f32, exp2_32(-1), 0.5, epsilon));
 }
 
 test "math.exp2_64" {
@@ -447,6 +455,8 @@ test "math.exp2_64" {
     try expect(math.approxEqAbs(f64, exp2_64(0.2), 1.148698, epsilon));
     try expect(math.approxEqAbs(f64, exp2_64(0.8923), 1.856133, epsilon));
     try expect(math.approxEqAbs(f64, exp2_64(1.5), 2.828427, epsilon));
+    try expect(math.approxEqAbs(f64, exp2_64(-1), 0.5, epsilon));
+    try expect(math.approxEqAbs(f64, exp2_64(-0x1.a05cc754481d1p-2), 0x1.824056efc687cp-1, epsilon));
 }
 
 test "math.exp2_32.special" {
