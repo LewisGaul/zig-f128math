@@ -212,6 +212,49 @@ Used by:
 - FreeBSD, OpenLibm (double/quadruple precision), Musl (quadruple precision)
   - 10-degree polynomial for quad
 
+A detailed description of the approach is given below for the range of 'normal' values, following the code snippet given.
+```zig
+fn exp2_64(x: f64) f64 {
+    const tblsiz = @intCast(u32, exp2dt.len / 2);
+    const redux: f64 = 0x1.8p52 / @intToFloat(f64, tblsiz);
+    const P1: f64 = 0x1.62e42fefa39efp-1;
+    const P2: f64 = 0x1.ebfbdff82c575p-3;
+    const P3: f64 = 0x1.c6b08d704a0a6p-5;
+    const P4: f64 = 0x1.3b2ab88f70400p-7;
+    const P5: f64 = 0x1.5d88003875c74p-10;
+
+    const ux = @bitCast(u64, x);
+    const ix = @intCast(u32, ux >> 32) & 0x7FFFFFFF;
+
+    // reduce x
+    var uf: f64 = x + redux;
+    // NOTE: musl performs an implicit 64-bit to 32-bit u32 truncation here
+    var i_0: u32 = @truncate(u32, @bitCast(u64, uf));
+    _ = @addWithOverflow(u32, i_0, tblsiz / 2, &i_0);
+
+    const k: u32 = i_0 / tblsiz * tblsiz;
+    const ik: i32 = @bitCast(i32, k / tblsiz);
+    i_0 %= tblsiz;
+    uf -= redux;
+
+    // r = exp2(y) = exp2t[i_0] * p(z - eps[i])
+    var z: f64 = x - uf;
+    const t: f64 = exp2dt[@intCast(usize, 2 * i_0)];
+    z -= exp2dt[@intCast(usize, 2 * i_0 + 1)];
+    const r: f64 = t + t * z * (P1 + z * (P2 + z * (P3 + z * (P4 + z * P5))));
+
+    return math.scalbn(r, ik);
+}
+```
+
+* Where does the `redux` value `0x1.8p52` come from?
+  * This is setting the top two bits (1.1000...), with the exponent set to the size of the mantissa (52 bits) and only the top bit in the mantissa set.
+  * When you add `x` this will discard any part of `x` that is too small to fit in the mantissa with the high-bit set.
+* Examples of the first step, where `redux=@bitCast(f64,0x42b8000000000000)` is added (with table size 256):
+  * `x=1`: `uf=0x42b8000000000100` - no reduction
+  * `x=0.511`: `uf=0x42b8000000000083` - the `0.01` is removed
+* ... TODO ...
+
 #### Other
 
 Used by:
