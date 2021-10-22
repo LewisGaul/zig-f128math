@@ -1,3 +1,6 @@
 .vscode/
+.favorites.json
+
 zig-out/
+zig-cache/
 zig-build/
