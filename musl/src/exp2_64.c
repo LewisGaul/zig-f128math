@@ -35,15 +35,15 @@
 #define TBLSIZE 256
 
 
-static const double
-redux = 0x1.8p52 / TBLSIZE,
-P1    = 0x1.62e42fefa39efp-1,
-P2    = 0x1.ebfbdff82c575p-3,
-P3    = 0x1.c6b08d704a0a6p-5,
-P4    = 0x1.3b2ab88f70400p-7,
-P5    = 0x1.5d88003875c74p-10;
+static const float64_t
+    redux = 0x1.8p52 / TBLSIZE,
+    P1    = 0x1.62e42fefa39efp-1,
+    P2    = 0x1.ebfbdff82c575p-3,
+    P3    = 0x1.c6b08d704a0a6p-5,
+    P4    = 0x1.3b2ab88f70400p-7,
+    P5    = 0x1.5d88003875c74p-10;
 
-static const double tbl[TBLSIZE * 2] = {
+static const float64_t tbl[TBLSIZE * 2] = {
 /*  exp2(z + eps)          eps     */
   0x1.6a09e667f3d5dp-1,  0x1.9880p-44,
   0x1.6b052fa751744p-1,  0x1.8000p-50,
@@ -334,11 +334,12 @@ static const double tbl[TBLSIZE * 2] = {
  *      Gal, S. and Bachelis, B.  An Accurate Elementary Mathematical Library
  *      for the IEEE Floating Point Standard.  TOMS 17(1), 26-46 (1991).
  */
-double exp2(double x)
+float64_t
+exp2 (float64_t x)
 {
-	double_t r, t, z;
+	float64_t r, t, z;
 	uint32_t ix, i0;
-	union {double f; uint64_t i;} u = {x};
+	union {float64_t f; uint64_t i;} u = {x};
 	union {uint32_t u; int32_t i;} k;
 
 	/* Filter out exceptional cases. */
@@ -396,19 +397,23 @@ double exp2(double x)
 	return scalbn(r, k.i);
 }
 
-int main()
-{
-    union {double f; uint64_t u;} r = {0x1.8p52};
-    printf("%e  "HEX64"  %d\n", r.f, r.u, TBLSIZE);
-    r.f = redux;
-    printf("redux: %e  "HEX64"\n\n", r.f, r.u);
 
-    double vals[10] = {1, 2, -1, 0.5, 0.511};
+int
+main ()
+{
+    union {float64_t f; uint64_t u;} r = {0x1.8p52};
+    DEBUG("%e  "HEX64"  %d\n", r.f, r.u, TBLSIZE);
+    r.f = redux;
+    DEBUG("redux: %e  "HEX64"\n\n", r.f, r.u);
+
+    float64_t vals[10] = {1, 2, -1, 0.5, 0.511};
     for (int i=0; i < sizeof(vals) / sizeof(vals[0]); i++) {
-        double input = vals[i];
+        float64_t input = vals[i];
         if (input == 0) break;
-        printf("IN:  %f\n", input);
-        double output = exp2(input);
-        printf("OUT: %f\n\n", output);
+        uint64_t input_bits = *(uint64_t*)(&input);
+        printf("IN:  "HEX64"  %f\n", input_bits, input);
+        float64_t output = exp2(input);
+        uint64_t output_bits = *(uint64_t*)(&output);
+        printf("OUT: "HEX64"  %f\n\n", output_bits, output);
     }
 }
