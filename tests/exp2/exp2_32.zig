@@ -18,25 +18,31 @@ const test_cases = [_]TestValue{
     // zig fmt: off
 
     // Special cases
-    Test( 0x0p+0,          0x1p+0        ),
-    Test(-0x0p+0,          0x1p+0        ),
-    Test( 0x1p-1074,       0x1p+0        ), // Smallest denorm positive
-    Test(-0x1p-1074,       0x1p+0        ), // Smallest denorm negative
-    Test( inf_f32,         inf_f32       ),
-    Test(-inf_f32,         0x0p+0        ),
-    Test( nan_f32,         nan_f32       ),
+    Test( 0x0p+0,          0x1p+0          ),
+    Test(-0x0p+0,          0x1p+0          ),
+    Test( inf_f32,         inf_f32         ),
+    Test(-inf_f32,         0x0p+0          ),
+    Test( nan_f32,         nan_f32         ),
 
     // Sanity cases
-    Test(-0x1.0223ap+3,    0x1.e8d134p-9 ),
-    Test( 0x1.161868p+2,   0x1.453672p+4 ),
-    Test(-0x1.0c34b4p+3,   0x1.890cap-9  ),
-    Test(-0x1.a206fp+2,    0x1.622d4ep-7 ),
-    Test( 0x1.288bbcp+3,   0x1.340ecep+9 ),
-    Test( 0x1.52efdp-1,    0x1.950eeep+0 ),
-    Test(-0x1.a05cc8p-2,   0x1.824056p-1 ),
-    Test( 0x1.1f9efap-1,   0x1.79dfa2p+0 ),
-    Test( 0x1.8c5dbp-1,    0x1.b5ceacp+0 ),
-    Test(-0x1.5b86eap-1,   0x1.3fd8bap-1 ),
+    Test(-0x1.0223ap+3,    0x1.e8d134p-9   ),
+    Test( 0x1.161868p+2,   0x1.453672p+4   ),
+    Test(-0x1.0c34b4p+3,   0x1.890cap-9    ),
+    Test(-0x1.a206fp+2,    0x1.622d4ep-7   ),
+    Test( 0x1.288bbcp+3,   0x1.340ecep+9   ),
+    Test( 0x1.52efdp-1,    0x1.950eeep+0   ),
+    Test(-0x1.a05cc8p-2,   0x1.824056p-1   ),
+    Test( 0x1.1f9efap-1,   0x1.79dfa2p+0   ),
+    Test( 0x1.8c5dbp-1,    0x1.b5ceacp+0   ),
+    Test(-0x1.5b86eap-1,   0x1.3fd8bap-1   ),
+
+    // Some boundary cases specific to exp2
+    Test( 0x1.fffffep+6,   0x1.ffff4ep+127 ), // The last value before the exp gets infinite
+    Test( 0x1p+7,          inf_f32         ), // The first value that gives infinite exp
+    // Test(-0x1.74910d52d3051p+9,    0x1p-1074               ), // The last value before the exp flushes to zero
+    // Test(-0x1.74910d52d3052p+9,    0x0p+0                  ), // The first value at which the exp flushes to zero
+    // Test(-0x1.6232bdd7abcd2p+9,    0x1.000000000007cp-1022 ), // The last value before the exp flushes to subnormal
+    // Test(-0x1.6232bdd7abcd3p+9,    0x1.ffffffffffcf8p-1023 ), // The first value for which exp flushes to subnormal
 
     // zig fmt: on
 };

@@ -20,8 +20,6 @@ const test_cases = [_]TestValue{
     // Special cases
     Test( 0x0p+0,                  0x1p+0                  ),
     Test(-0x0p+0,                  0x1p+0                  ),
-    Test( 0x1p-1074,               0x1p+0                  ), // Smallest denorm positive
-    Test(-0x1p-1074,               0x1p+0                  ), // Smallest denorm negative
     Test( inf_f64,                 inf_f64                 ),
     Test(-inf_f64,                 0x0p+0                  ),
     Test( nan_f64,                 nan_f64                 ),
@@ -37,6 +35,14 @@ const test_cases = [_]TestValue{
     Test( 0x1.1f9ef934745cbp-1,    0x1.79dfa14ab121ep+0    ),
     Test( 0x1.8c5db097f7442p-1,    0x1.b5cead2247372p+0    ),
     Test(-0x1.5b86ea8118a0ep-1,    0x1.3fd8ba33216b9p-1    ),
+
+    // Some boundary cases specific to exp2
+    Test( 0x1.fffffffffffffp+9,    0x1.ffffffffffd3ap+1023 ), // The last value before the exp gets infinite
+    Test( 0x1p+10,                 inf_f64                 ), // The first value that gives infinite exp
+    // Test(-0x1.74910d52d3051p+9,    0x1p-1074               ), // The last value before the exp flushes to zero
+    // Test(-0x1.74910d52d3052p+9,    0x0p+0                  ), // The first value at which the exp flushes to zero
+    // Test(-0x1.6232bdd7abcd2p+9,    0x1.000000000007cp-1022 ), // The last value before the exp flushes to subnormal
+    // Test(-0x1.6232bdd7abcd3p+9,    0x1.ffffffffffcf8p-1023 ), // The first value for which exp flushes to subnormal
 
     // zig fmt: on
 };
