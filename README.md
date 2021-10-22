@@ -18,7 +18,7 @@ There is a single 'sign' bit (+ve/-ve), an 'exponent' section, and a 'mantissa' 
 
  bits | precision | C name      |  E |   M | decimal digits |     max
 ------|-----------|-------------|---:|----:|:--------------:|:-------------:
- f32  | single    | float       |  7 |  23 |    7.22        | 3.4 x 10^38
+ f32  | single    | float       |  8 |  23 |    7.22        | 3.4 x 10^38
  f64  | double    | double      | 11 |  52 |   15.95        | 3.2 x 10^616
  f128 | quadruple | long double | 15 | 112 |   34.02        | 1.2 x 10^4932
 
