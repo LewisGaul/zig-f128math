@@ -20,13 +20,16 @@ const test_cases = [_]TestValue{
     // zig fmt: off
 
     // Special cases
-    Test( 0x0p+0,          0x1p+0          ),
-    Test(-0x0p+0,          0x1p+0          ),
-    Test( 0x1p+0,          0x1p+1          ),
-    Test(-0x1p+0,          0x1p-1          ),
-    Test( inf_f32,         inf_f32         ),
-    Test(-inf_f32,         0x0p+0          ),
-    Test( nan_f32,         nan_f32         ),
+    Test( 0x0p+0,   0x1p+0  ),
+    Test(-0x0p+0,   0x1p+0  ),
+    Test( 0x1p+0,   0x1p+1  ),
+    Test(-0x1p+0,   0x1p-1  ),
+    Test( inf_f32,  inf_f32 ),
+    Test(-inf_f32,  0x0p+0  ),
+    Test( nan_f32,  nan_f32 ),
+    Test(-nan_f32,  nan_f32 ),
+    Test( @bitCast(f32, @as(u32, 0x7ff01234)),  nan_f32 ),
+    Test( @bitCast(f32, @as(u32, 0xfff01234)),  nan_f32 ),
 
     // Sanity cases
     Test(-0x1.0223a0p+3,   0x1.e8d134p-9   ),

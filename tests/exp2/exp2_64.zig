@@ -20,13 +20,16 @@ const test_cases = [_]TestValue{
     // zig fmt: off
 
     // Special cases
-    Test( 0x0p+0,                  0x1p+0                  ),
-    Test(-0x0p+0,                  0x1p+0                  ),
-    Test( 0x1p+0,                  0x1p+1                  ),
-    Test(-0x1p+0,                  0x1p-1                  ),
-    Test( inf_f64,                 inf_f64                 ),
-    Test(-inf_f64,                 0x0p+0                  ),
-    Test( nan_f64,                 nan_f64                 ),
+    Test( 0x0p+0,   0x1p+0  ),
+    Test(-0x0p+0,   0x1p+0  ),
+    Test( 0x1p+0,   0x1p+1  ),
+    Test(-0x1p+0,   0x1p-1  ),
+    Test( inf_f64,  inf_f64 ),
+    Test(-inf_f64,  0x0p+0  ),
+    Test( nan_f64,  nan_f64 ),
+    Test(-nan_f64,  nan_f64 ),
+    Test( @bitCast(f64, @as(u64, 0x7ff0123400000000)),  nan_f64 ),
+    Test( @bitCast(f64, @as(u64, 0xfff0123400000000)),  nan_f64 ),
 
     // Sanity cases
     Test(-0x1.02239f3c6a8f1p+3,    0x1.e8d13c396f452p-9    ),
@@ -44,7 +47,7 @@ const test_cases = [_]TestValue{
     Test( 0x1.fffffffffffffp+9,    0x1.ffffffffffd3ap+1023 ), // The last value before the exp gets infinite
     Test( 0x1p+10,                 inf_f64                 ), // The first value that gives infinite exp
     Test(-0x1.0c8p+10,             0x1p-1074               ), // The last value before the exp flushes to zero
-    // TODO: Incorrectly not flushing to zero.
+    // TODO: Failing to flush to zero.
     Test(-0x1.0c80000000001p+10,   0x0p+0                  ), // The first value at which the exp flushes to zero
     Test(-0x1.ffp+9,               0x1p-1022               ), // The last value before the exp flushes to subnormal
     Test(-0x1.ff00000000001p+9,    0x1.ffffffffffd3ap-1023 ), // The first value for which exp flushes to subnormal

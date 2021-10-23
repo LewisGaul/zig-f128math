@@ -55,6 +55,11 @@ fn exp2_32(x: f32) f32 {
     const P3: f32 = 0x1.c6b348p-5;
     const P4: f32 = 0x1.3b2c9cp-7;
 
+    // Return canonical NaN for any NaN input.
+    if (math.isNan(x)) {
+        return math.nan(f32);
+    }
+
     var u = @bitCast(u32, x);
     const ix = u & 0x7FFFFFFF;
 
@@ -373,13 +378,13 @@ fn exp2_64(x: f64) f64 {
     const P4: f64 = 0x1.3b2ab88f70400p-7;
     const P5: f64 = 0x1.5d88003875c74p-10;
 
-    const ux = @bitCast(u64, x);
-    const ix = @intCast(u32, ux >> 32) & 0x7FFFFFFF;
-
-    // TODO: This should be handled beneath.
+    // Return canonical NaN for any NaN input.
     if (math.isNan(x)) {
         return math.nan(f64);
     }
+
+    const ux = @bitCast(u64, x);
+    const ix = @intCast(u32, ux >> 32) & 0x7FFFFFFF;
 
     // |x| >= 1022 or nan
     if (ix >= 0x408FF000) {
@@ -388,7 +393,7 @@ fn exp2_64(x: f64) f64 {
             math.raiseOverflow();
             return math.inf(f64);
         }
-        // -inf or -nan
+        // -inf or nan
         if (ix >= 0x7FF00000) {
             return -1 / x;
         }
@@ -415,7 +420,6 @@ fn exp2_64(x: f64) f64 {
 
     // reduce x
     var uf: f64 = x + redux;
-    // NOTE: musl performs an implicit 64-bit to 32-bit u32 truncation here
     var i_0: u32 = @truncate(u32, @bitCast(u64, uf));
     _ = @addWithOverflow(u32, i_0, tblsiz / 2, &i_0);
 
@@ -710,40 +714,40 @@ fn exp2_128(x: f128) f128 {
     const P9: f64 = 0x1.b52541ff59713p-24;
     const P10: f64 = 0x1.e4cf56a391e22p-28;
 
-    // const ux = @bitCast(u128, x);
-    // const ix = @intCast(u32, ux >> 32) & 0x7FFFFFFF;
-
+    // Return canonical NaN for any NaN input.
     if (math.isNan(x)) {
         return math.nan(f128);
     }
 
-    // TODO
-    // // |x| >= 1022 or nan
-    // if (ix >= 0x408FF000) {
-    //     // x >= 1024 or nan
-    //     if (ix >= 0x40900000 and ux >> 63 == 0) {
-    //         math.raiseOverflow();
-    //         return math.inf(f128);
-    //     }
-    //     // -inf or -nan
-    //     if (ix >= 0x7FF00000) {
-    //         return -1 / x;
-    //     }
-    //     // x <= -1022
-    //     if (ux >> 63 != 0) {
-    //         // underflow
-    //         if (x <= -1075 or x - 0x1.0p52 + 0x1.0p52 != x) {
-    //             math.doNotOptimizeAway(@floatCast(f32, -0x1.0p-149 / x));
-    //         }
-    //         if (x <= -1075) {
-    //             return 0;
-    //         }
-    //     }
-    // }
-    // // |x| < 0x1p-54
-    // else if (ix < 0x3C900000) {
-    //     return 1.0 + x;
-    // }
+    const ux = @bitCast(u128, x);
+    const e: u16 = @intCast(u16, ux >> 112) & 0x7FFF;  // exponent
+
+    // |x| >= 16384 or nan
+    if (e >= 0x3FFF + 14) {
+        // x >= 16384
+        if (e >= 0x3FFF + 15 and ux >> 127 == 0) {
+            math.raiseOverflow();
+            return math.inf(f128);
+        }
+        // -inf or nan
+        if (e == 0x7FFF) {
+            return -1 / x;
+        }
+        // x <= -1022
+        if (x < -16382) {
+            // underflow
+            if (x <= -16495 or x - 0x1p112 + 0x1p112 != x) {
+                math.doNotOptimizeAway(@floatCast(f32, -0x1.0p-149 / x));
+            }
+            if (x <= -16495) {
+                return 0;
+            }
+        }
+    }
+    // |x| < 0x1p-114
+    else if (e < 0x3FFF - 114) {
+        return 1.0 + x;
+    }
 
     // NOTE: musl relies on unsafe behaviours which are replicated below
     // (addition overflow, division truncation, casting). Appears that this
@@ -771,18 +775,6 @@ fn exp2_128(x: f128) f128 {
 
     return math.scalbn(r, k_i);
 }
-
-// test "tmp exercising of exp2 with debug in place" {
-//     std.debug.print("\n", .{});
-//     const vals = [_]f64{ 1, 2, -1, 0.5 };
-//     for (vals) |input| {
-//         // const input_bits = @bitCast(u64, input);
-//         std.debug.print("IN:  {e}\n", .{input});
-//         const output = exp2_64(input);
-//         std.debug.print("OUT: {e}\n", .{output});
-//         std.debug.print("\n", .{});
-//     }
-// }
 
 test "math.exp2" {
     try expect(exp2(@as(f32, 0.8923)) == exp2_32(0.8923));
