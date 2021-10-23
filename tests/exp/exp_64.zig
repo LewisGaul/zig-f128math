@@ -5,6 +5,8 @@ const math = std.math;
 const inf_f64 = math.inf_f64;
 const nan_f64 = math.nan_f64;
 
+const f128math = @import("f128math");
+
 const TestValue = struct {
     input: f64,
     exp_output: f64,

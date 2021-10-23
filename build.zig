@@ -1,9 +1,10 @@
-const Builder = @import("std").build.Builder;
+const std = @import("std");
+const Builder = std.build.Builder;
 
-pub fn build(b: *Builder) void {
+pub fn build(b: *Builder) !void {
     // Tests
     // -------
-    var tests = b.addTest("tests/exp2/exp2_128.zig");
+    var tests = b.addTest("tests/tests.zig");
     tests.addPackagePath("f128math", "src/lib.zig");
 
     // Define the 'test' subcommand.

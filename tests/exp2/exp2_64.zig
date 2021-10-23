@@ -5,6 +5,8 @@ const math = std.math;
 const inf_f64 = math.inf_f64;
 const nan_f64 = math.nan_f64;
 
+const f128math = @import("f128math");
+
 const TestValue = struct {
     input: f64,
     exp_output: f64,
@@ -52,7 +54,7 @@ test {
     for (test_cases) |tc| {
         const input_bits = @bitCast(u64, tc.input);
         const exp_output_bits = @bitCast(u64, tc.exp_output);
-        const output: f64 = math.exp2(tc.input);
+        const output: f64 = f128math.exp2(tc.input);
         const output_bits = @bitCast(u64, output);
         const sign_pad = if ((input_bits & 0x8000000000000000) > 0) "" else " ";
         const no_sign_pad = if ((input_bits & 0x8000000000000000) > 0) " " else "";
