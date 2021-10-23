@@ -375,8 +375,7 @@ exp2q (float128_t x)
 		if (x < -16382) {
 			if (x <= -16495 || x - 0x1p112 + 0x1p112 != x)
 				/* underflow */
-				// FORCE_EVAL((float)(-0x1p-149/x));
-				return 0;
+				FORCE_EVAL((float)(-0x1p-149/x));
 			if (x <= -16446)
 				return 0;
 		}

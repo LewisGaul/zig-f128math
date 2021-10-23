@@ -14,13 +14,15 @@ typedef __float128   float128_t;
 #define HEX64  "0x%016lx"
 #define HEX128 "0x%016lx%016lx"
 
+
 #define DEBUG_ENABLED 1
 
 #define DEBUG(fmt, ...)             \
     do {                            \
         if (DEBUG_ENABLED)          \
             printf(fmt,__VA_ARGS__);\
-    } while (0)
+    } while(0)
+
 
 // TODO: Not working for some reason... prints nothing with no warnings.
 #define quadmath_printf(fmt, ...)                               \
@@ -28,7 +30,21 @@ typedef __float128   float128_t;
         char buf[256] = {};                                     \
         quadmath_snprintf(buf, sizeof(buf), fmt, __VA_ARGS__);  \
         printf("%s", buf);                                      \
-    } while (0)
+    } while(0)
+
+
+#define FORCE_EVAL(x) do {                          \
+	if (sizeof(x) == sizeof(float32_t)) {           \
+		volatile float32_t __x;                     \
+		__x = (x);                                  \
+	} else if (sizeof(x) == sizeof(float64_t)) {    \
+		volatile float64_t __x;                     \
+		__x = (x);                                  \
+	} else {                                        \
+		volatile float128_t __x;                    \
+		__x = (x);                                  \
+	}                                               \
+} while(0)
 
 
 #endif  // UTIL_H

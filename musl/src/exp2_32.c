@@ -105,8 +105,7 @@ exp2f (float32_t x)
 		}
 		if (u.i >= 0x80000000) {  /* x < -126 */
 			if (u.i >= 0xc3160000 || (u.i & 0x0000ffff))
-				// FORCE_EVAL(-0x1p-149f/x);
-				return 0;
+				FORCE_EVAL(-0x1p-149f/x);
 			if (u.i >= 0xc3160000)  /* x <= -150 */
 				return 0;
 		}

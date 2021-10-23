@@ -356,8 +356,7 @@ exp2 (float64_t x)
 		if (u.i>>63) {  /* x <= -1022 */
 			/* underflow */
 			if (x <= -1075 || x - 0x1p52 + 0x1p52 != x)
-				//FORCE_EVAL((float)(-0x1p-149/x));
-                return 0;
+				FORCE_EVAL((float)(-0x1p-149/x));
 			if (x <= -1075)
 				return 0;
 		}
