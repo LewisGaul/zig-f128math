@@ -21,11 +21,13 @@ const test_cases = [_]TestValue{
     // zig fmt: off
 
     // Special cases
-    Test( 0x0p+0,                  0x1p+0                  ),
-    Test(-0x0p+0,                  0x1p+0                  ),
-    Test( inf_f128,                inf_f128                ),
-    Test(-inf_f128,                0x0p+0                  ),
-    Test( nan_f128,                nan_f128                ),
+    Test( 0x0p+0,    0x1p+0   ),
+    Test(-0x0p+0,    0x1p+0   ),
+    Test( 0x1p+0,    0x1p+1   ),
+    Test(-0x1p+0,    0x1p-1   ),
+    Test( inf_f128,  inf_f128 ),
+    Test(-inf_f128,  0x0p+0   ),
+    Test( nan_f128,  nan_f128 ),
 
     // Sanity cases
     Test(-0x1.02239f3c6a8f13dep+3, 0x1.e8d13c396f44f500bfc7cefe1304p-9 ),
@@ -41,16 +43,17 @@ const test_cases = [_]TestValue{
 
     // Some boundary cases specific to exp2
     Test( 0x1p+14 - 0x1p-99,       0x1.ffffffffffffffffffffffffd3a3p+16383 ), // The last value before the exp gets infinite
-    Test( 0x1p+15,                 inf_f128                ), // The first value that gives infinite exp
-    // Test(-0x1.74910d52d3051p+9,    0x1p-1074               ), // The last value before the exp flushes to zero
-    // Test(-0x1.74910d52d3052p+9,    0x0p+0                  ), // The first value at which the exp flushes to zero
-    // Test(-0x1.6232bdd7abcd2p+9,    0x1.000000000007cp-1022 ), // The last value before the exp flushes to subnormal
-    // Test(-0x1.6232bdd7abcd3p+9,    0x1.ffffffffffcf8p-1023 ), // The first value for which exp flushes to subnormal
+    Test( 0x1p+14,                 inf_f128                                ), // The first value that gives infinite exp
+    Test(-0x1.01b8p+14,            0x1p-16494                              ), // The last value before the exp flushes to zero
+    Test(-0x1.01b8p+14 - 0x1p-98,  0x0p+0                                  ), // The first value at which the exp flushes to zero
+    Test(-0x1.fffp+13,             0x1p-16382                              ), // The last value before the exp flushes to subnormal
+    Test(-0x1.fffp+13 - 0x1p-99,   0x0.ffffffffffffffffffffffffe9d2p-16382 ), // The first value for which exp flushes to subnormal
+    Test(-0x1.fff8p+13,            0x1p-16383                              ),
 
     // zig fmt: on
 };
 
-test {
+test "exp2_128()" {
     var failure = false;
     for (test_cases) |tc| {
         const input_bits = @bitCast(u128, tc.input);
@@ -60,15 +63,15 @@ test {
         const sign_pad = if ((input_bits & 0x80000000000000000000000000000000) > 0) "" else " ";
         const no_sign_pad = if ((input_bits & 0x80000000000000000000000000000000) > 0) " " else "";
         print(
-            " in:  {[2]s}{[0]x:<34}{[3]s} {[2]s}{[0]e:<34}{[3]s} 0x{[1]x:0<32}\n",
+            " in:  {[2]s}{[0]x:<40}{[3]s} {[2]s}{[0]e:<40}{[3]s} 0x{[1]x:0>32}\n",
             .{ tc.input, input_bits, sign_pad, no_sign_pad },
         );
         print(
-            "out:   {[0]x:<34}  {[0]e:<34} 0x{[1]x:0<32}\n",
+            "out:   {[0]x:<40}  {[0]e:<40} 0x{[1]x:0>32}\n",
             .{ output, output_bits },
         );
         print(
-            "exp:   {[0]x:<34}  {[0]e:<34} 0x{[1]x:0<32}\n",
+            "exp:   {[0]x:<40}  {[0]e:<40} 0x{[1]x:0>32}\n",
             .{ tc.exp_output, exp_output_bits },
         );
         if (output_bits != exp_output_bits) {
