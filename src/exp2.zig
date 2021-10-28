@@ -28,7 +28,7 @@ pub fn exp2(x: anytype) @TypeOf(x) {
     };
 }
 
-const exp2ft = [_]f64{
+const exp2_32_table = [_]f64{
     0x1.6a09e667f3bcdp-1,
     0x1.7a11473eb0187p-1,
     0x1.8ace5422aa0dbp-1,
@@ -48,7 +48,7 @@ const exp2ft = [_]f64{
 };
 
 fn exp2_32(x: f32) f32 {
-    const tblsiz = @intCast(u32, exp2ft.len);
+    const tblsiz = @intCast(u32, exp2_32_table.len);
     const redux: f32 = 0x1.8p23 / @intToFloat(f32, tblsiz);
     const P1: f32 = 0x1.62e430p-1;
     const P2: f32 = 0x1.ebfbe0p-3;
@@ -95,7 +95,7 @@ fn exp2_32(x: f32) f32 {
 
     var uf = x + redux;
     var i_0 = @bitCast(u32, uf);
-    _ = @addWithOverflow(u32, i_0, tblsiz / 2, &i_0);
+    i_0 +%= tblsiz / 2;
 
     const k = i_0 / tblsiz;
     const uk = @bitCast(f64, @as(u64, 0x3FF + k) << 52);
@@ -103,13 +103,13 @@ fn exp2_32(x: f32) f32 {
     uf -= redux;
 
     const z: f64 = x - uf;
-    var r: f64 = exp2ft[@intCast(usize, i_0)];
+    var r: f64 = exp2_32_table[@intCast(usize, i_0)];
     const t: f64 = r * z;
     r = r + t * (P1 + z * P2) + t * (z * z) * (P3 + z * P4);
     return @floatCast(f32, r * uk);
 }
 
-const exp2dt = [_]f64{
+const exp2_64_table = [_]f64{
     //  exp2(z + eps)          eps
     0x1.6a09e667f3d5dp-1, 0x1.9880p-44,
     0x1.6b052fa751744p-1, 0x1.8000p-50,
@@ -370,7 +370,7 @@ const exp2dt = [_]f64{
 };
 
 fn exp2_64(x: f64) f64 {
-    const tblsiz: u32 = @intCast(u32, exp2dt.len / 2);
+    const tblsiz: u32 = @intCast(u32, exp2_64_table.len / 2);
     const redux: f64 = 0x1.8p52 / @intToFloat(f64, tblsiz);
     const P1: f64 = 0x1.62e42fefa39efp-1;
     const P2: f64 = 0x1.ebfbdff82c575p-3;
@@ -421,7 +421,7 @@ fn exp2_64(x: f64) f64 {
     // reduce x
     var uf: f64 = x + redux;
     var i_0: u32 = @truncate(u32, @bitCast(u64, uf));
-    _ = @addWithOverflow(u32, i_0, tblsiz / 2, &i_0);
+    i_0 +%= tblsiz / 2;
 
     const k: u32 = i_0 / tblsiz * tblsiz;
     const ik: i32 = @divTrunc(@bitCast(i32, k), tblsiz);
@@ -430,14 +430,14 @@ fn exp2_64(x: f64) f64 {
 
     // r = exp2(y) = exp2t[i_0] * p(z - eps[i])
     var z: f64 = x - uf;
-    const t: f64 = exp2dt[@intCast(usize, 2 * i_0)];
-    z -= exp2dt[@intCast(usize, 2 * i_0 + 1)];
+    const t: f64 = exp2_64_table[@intCast(usize, 2 * i_0)];
+    z -= exp2_64_table[@intCast(usize, 2 * i_0 + 1)];
     const r: f64 = t + t * z * (P1 + z * (P2 + z * (P3 + z * (P4 + z * P5))));
 
     return math.scalbn(r, ik);
 }
 
-const exp2lt = [_]f128{
+const exp2_128_table = [_]f128{
     0x1.6a09e667f3bcc908b2fb1366dfeap-1,
     0x1.6c012750bdabeed76a99800f4edep-1,
     0x1.6dfb23c651a2ef220e2cbe1bc0d4p-1,
@@ -568,7 +568,8 @@ const exp2lt = [_]f128{
     0x1.68155d44ca973081c57227b9f69ep+0,
 };
 
-const exp2leps = [exp2lt.len]f32{
+// Use a separate table since these values are only 32-bit floats.
+const exp2_128_eps_table = [exp2_128_table.len]f32{
     -0x1.5c50p-101,
     -0x1.5d00p-106,
     0x1.8e90p-102,
@@ -700,7 +701,7 @@ const exp2leps = [exp2lt.len]f32{
 };
 
 fn exp2_128(x: f128) f128 {
-    const tblsiz: u32 = @intCast(u32, exp2lt.len);
+    const tblsiz: u32 = @intCast(u32, exp2_128_table.len);
     const redux: f128 = 0x1.8p112 / @intToFloat(f128, tblsiz);
 
     const P1: f128 = 0x1.62e42fefa39ef35793c7673007e6p-1;
@@ -720,7 +721,7 @@ fn exp2_128(x: f128) f128 {
     }
 
     const ux = @bitCast(u128, x);
-    const e: u16 = @intCast(u16, ux >> 112) & 0x7FFF;  // exponent
+    const e: u16 = @intCast(u16, ux >> 112) & 0x7FFF; // exponent
 
     // |x| >= 16384 or nan
     if (e >= 0x3FFF + 14) {
@@ -766,8 +767,8 @@ fn exp2_128(x: f128) f128 {
     var z: f128 = x - u_f;
 
     // r = exp2(y) = exp2t[i_0] * p(z - eps[i])
-    const t: f128 = exp2lt[@intCast(usize, i_0)];
-    z -= exp2leps[@intCast(usize, i_0)];
+    const t: f128 = exp2_128_table[@intCast(usize, i_0)];
+    z -= exp2_128_eps_table[@intCast(usize, i_0)];
     // zig fmt: off
     const r: f128 = t + t * z * (P1 + z * (P2 + z * (P3 + z * (P4 + z * (P5
         + z * (P6 + z * (P7 + z * (P8 + z * (P9 + z * P10)))))))));
@@ -776,13 +777,13 @@ fn exp2_128(x: f128) f128 {
     return math.scalbn(r, k_i);
 }
 
-test "math.exp2" {
+test "math.exp2() delegation" {
     try expect(exp2(@as(f32, 0.8923)) == exp2_32(0.8923));
     try expect(exp2(@as(f64, 0.8923)) == exp2_64(0.8923));
     try expect(exp2(@as(f128, 0.8923)) == exp2_128(0.8923));
 }
 
-test "math.exp2_32" {
+test "math.exp2_32() basic" {
     const epsilon = 0.000001;
 
     try expect(exp2_32(0.0) == 1.0);
@@ -793,7 +794,7 @@ test "math.exp2_32" {
     try expect(math.approxEqAbs(f32, exp2_32(-1), 0.5, epsilon));
 }
 
-test "math.exp2_64" {
+test "math.exp2_64() basic" {
     const epsilon = 0.000001;
 
     try expect(exp2_64(0.0) == 1.0);
@@ -801,30 +802,14 @@ test "math.exp2_64" {
     try expect(math.approxEqAbs(f64, exp2_64(0.8923), 1.856133, epsilon));
     try expect(math.approxEqAbs(f64, exp2_64(1.5), 2.828427, epsilon));
     try expect(math.approxEqAbs(f64, exp2_64(-1), 0.5, epsilon));
-    try expect(math.approxEqAbs(f64, exp2_64(-0x1.a05cc754481d1p-2), 0x1.824056efc687cp-1, epsilon));
 }
 
-test "math.exp2_128" {
+test "math.exp2_128() basic" {
     const epsilon = 0.000001;
 
-    try expect(exp2_64(0.0) == 1.0);
+    try expect(exp2_128(0.0) == 1.0);
     try expect(math.approxEqAbs(f128, exp2_128(0.2), 1.148698, epsilon));
     try expect(math.approxEqAbs(f128, exp2_128(0.8923), 1.856133, epsilon));
     try expect(math.approxEqAbs(f128, exp2_128(1.5), 2.828427, epsilon));
     try expect(math.approxEqAbs(f128, exp2_128(-1), 0.5, epsilon));
-}
-
-test "math.exp2_32.special" {
-    try expect(math.isPositiveInf(exp2_32(math.inf(f32))));
-    try expect(math.isNan(exp2_32(math.nan(f32))));
-}
-
-test "math.exp2_64.special" {
-    try expect(math.isPositiveInf(exp2_64(math.inf(f64))));
-    try expect(math.isNan(exp2_64(math.nan(f64))));
-}
-
-test "math.exp2_128.special" {
-    // try expect(math.isPositiveInf(exp2_128(math.inf(f128)))); TODO
-    try expect(math.isNan(exp2_128(math.nan(f128))));
 }
