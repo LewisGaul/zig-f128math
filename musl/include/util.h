@@ -15,7 +15,7 @@ typedef __float128   float128_t;
 #define HEX128 "0x%016lx%016lx"
 
 
-#define DEBUG_ENABLED 1
+#define DEBUG_ENABLED 0
 
 #define DEBUG(fmt, ...)             \
     do {                            \

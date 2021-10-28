@@ -135,7 +135,14 @@ exp2f (float32_t x)
 int
 main ()
 {
-    float32_t vals[10] = {1, 2, -1, 0.5, 0.511, -0x1.2ap+7, -0x1.2a0002p+7};
+    float32_t vals[10] = {
+		1, 2, -1, 0.5, 0.511,
+		-0x1.2ap+7,
+		-0x1.2a0002p+7,
+		-0x1.f8p+6,
+		-0x1.f80002p+6,
+		-0x1.fcp+6,
+	};
     for (int i=0; i < sizeof(vals) / sizeof(vals[0]); i++) {
         float32_t input = vals[i];
         if (input == 0) break;

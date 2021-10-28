@@ -75,11 +75,11 @@ fn exp2_32(x: f32) f32 {
         }
         // x < -126
         if (u >= 0x80000000) {
-            if (u >= 0xC3160000 or u & 0x000FFFF != 0) {
+            if (u > 0xC3150000 or u & 0x000FFFF != 0) {
                 math.doNotOptimizeAway(-0x1.0p-149 / x);
             }
             // x <= -150
-            if (u >= 0x3160000) {
+            if (u > 0xC3150000) {
                 return 0;
             }
         }
@@ -400,10 +400,10 @@ fn exp2_64(x: f64) f64 {
         // x <= -1022
         if (ux >> 63 != 0) {
             // underflow
-            if (x <= -1075 or x - 0x1.0p52 + 0x1.0p52 != x) {
+            if (x < -1074 or x - 0x1.0p52 + 0x1.0p52 != x) {
                 math.doNotOptimizeAway(@floatCast(f32, -0x1.0p-149 / x));
             }
-            if (x <= -1075) {
+            if (x < -1074) {
                 return 0;
             }
         }
@@ -737,10 +737,10 @@ fn exp2_128(x: f128) f128 {
         // x <= -1022
         if (x < -16382) {
             // underflow
-            if (x <= -16495 or x - 0x1p112 + 0x1p112 != x) {
+            if (x < -16494 or x - 0x1p112 + 0x1p112 != x) {
                 math.doNotOptimizeAway(@floatCast(f32, -0x1.0p-149 / x));
             }
-            if (x <= -16495) {
+            if (x < -16494) {
                 return 0;
             }
         }

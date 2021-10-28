@@ -47,7 +47,6 @@ const test_cases = [_]TestValue{
     Test( 0x1.fffffffffffffp+9,    0x1.ffffffffffd3ap+1023 ), // The last value before the exp gets infinite
     Test( 0x1p+10,                 inf_f64                 ), // The first value that gives infinite exp
     Test(-0x1.0c8p+10,             0x1p-1074               ), // The last value before the exp flushes to zero
-    // TODO: Failing to flush to zero.
     Test(-0x1.0c80000000001p+10,   0x0p+0                  ), // The first value at which the exp flushes to zero
     Test(-0x1.ffp+9,               0x1p-1022               ), // The last value before the exp flushes to subnormal
     Test(-0x1.ff00000000001p+9,    0x1.ffffffffffd3ap-1023 ), // The first value for which exp flushes to subnormal
@@ -73,11 +72,11 @@ test "exp2_64()" {
             "out:   {[0]x:<24}  {[0]e:<24} 0x{[1]x:0>16}\n",
             .{ output, output_bits },
         );
-        print(
-            "exp:   {[0]x:<24}  {[0]e:<24} 0x{[1]x:0>16}\n",
-            .{ tc.exp_output, exp_output_bits },
-        );
         if (output_bits != exp_output_bits) {
+            print(
+                "exp:   {[0]x:<24}  {[0]e:<24} 0x{[1]x:0>16}\n",
+                .{ tc.exp_output, exp_output_bits },
+            );
             print("FAILED\n", .{});
             failure = true;
         }

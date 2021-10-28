@@ -49,8 +49,7 @@ const test_cases = [_]TestValue{
     Test(-0x1.2ap+7,       0x1p-149        ), // The last value before the exp flushes to zero
     Test(-0x1.2a0002p+7,   0x0p+0          ), // The first value at which the exp flushes to zero
     Test(-0x1.f8p+6,       0x1p-126        ), // The last value before the exp flushes to subnormal
-    // TODO: Incorrectly giving zero (also fix expected val).
-    Test(-0x1.f80002p+6,   0x1.fffp-127    ), // The first value for which exp flushes to subnormal
+    Test(-0x1.f80002p+6,   0x1.ffff5p-127  ), // The first value for which exp flushes to subnormal
     Test(-0x1.fcp+6,       0x1p-127        ),
 
     // zig fmt: on
@@ -73,11 +72,11 @@ test "exp2_32()" {
             "out:   {[0]x:<16}  {[0]e:<16} 0x{[1]x:0>8}\n",
             .{ output, output_bits },
         );
-        print(
-            "exp:   {[0]x:<16}  {[0]e:<16} 0x{[1]x:0>8}\n",
-            .{ tc.exp_output, exp_output_bits },
-        );
         if (output_bits != exp_output_bits) {
+            print(
+                "exp:   {[0]x:<16}  {[0]e:<16} 0x{[1]x:0>8}\n",
+                .{ tc.exp_output, exp_output_bits },
+            );
             print("FAILED\n", .{});
             failure = true;
         }
