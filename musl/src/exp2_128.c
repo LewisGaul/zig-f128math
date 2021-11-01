@@ -415,7 +415,24 @@ exp2q (float128_t x)
 int
 main ()
 {
-    float128_t vals[10] = {1, 2, -1, 0.5, 0.511, 0x1p13Q};
+    float128_t vals[32] = {
+		1, 2, -1, 0.5, 0.511,
+		 0x1p+14Q - 0x1p-99Q,
+		 0x1.ffff333333333334p+13Q,
+		 0x1p+14Q,
+		 0x1.0000666666666666p+14Q,
+		-0x1.01bcp+14Q + 0x1p-98Q,
+		-0x1.00f799999999999ap+14Q,
+		-0x1.01bcp+14Q,
+		-0x1.00f8p+14Q,
+		-0x1.fffp+13Q,
+		-0x1.fffp+13Q - 0x1p-99Q,
+		-0x1.fff4p+13Q,
+		-0x1.fff8p+13Q,
+		-0x1.fffcp+13Q,
+		-0x1p+14Q,
+		 0x1p-16384Q,
+	};
     for (int i=0; i < sizeof(vals) / sizeof(vals[0]); i++) {
         float128_t input = vals[i];
         if (input == 0) break;

@@ -45,9 +45,13 @@ const test_cases = [_]TestValue{
 
     // Some boundary cases specific to exp2
     Test( 0x1.fffffep+6,   0x1.ffff4ep+127 ), // The last value before the exp gets infinite
+    Test( 0x1.ff999ap+6,   0x1.ddb6a2p+127 ),
     Test( 0x1p+7,          inf_f32         ), // The first value that gives infinite exp
-    Test(-0x1.2ap+7,       0x1p-149        ), // The last value before the exp flushes to zero
-    Test(-0x1.2a0002p+7,   0x0p+0          ), // The first value at which the exp flushes to zero
+    Test( 0x1.003334p+7,   inf_f32         ),
+    Test(-0x1.2bccccp+7,   0x1p-149        ), // The last value before the exp flushes to zero
+    Test(-0x1.2ap+7,       0x1p-149        ),
+    Test(-0x1.2cp+7,       0x0p+0          ), // The first value at which the exp flushes to zero
+    Test(-0x1.2c3334p+7,   0x0p+0          ),
     Test(-0x1.f8p+6,       0x1p-126        ), // The last value before the exp flushes to subnormal
     Test(-0x1.f80002p+6,   0x1.ffff5p-127  ), // The first value for which exp flushes to subnormal
     Test(-0x1.fcp+6,       0x1p-127        ),

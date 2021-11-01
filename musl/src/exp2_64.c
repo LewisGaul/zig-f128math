@@ -405,7 +405,26 @@ main ()
     r.f = redux;
     DEBUG("redux: %e  "HEX64"\n\n", r.f, r.u);
 
-    float64_t vals[10] = {1, 2, -1, 0.5, 0.511, -0x1.ff8p+9, -0x1.0c8000000000p+10};
+    float64_t vals[32] = {
+        1, 2, -1, 0.5, 0.511,
+         0x1.fffffffffffffp+9,
+         0x1.fff3333333333p+9,
+         0x1p+10,
+         0x1.0006666666666p+10,
+        -0x1.0cbffffffffffp+10,
+        -0x1.0c8p+10,
+        -0x1.0cap+10,
+        -0x1.0ccp+10,
+        -0x1p+11,
+        -0x1.ffp+9,
+        -0x1.fef3333333333p+9,
+        -0x1.ff00000000001p+9,
+        -0x1.ff0cccccccccdp+9,
+        -0x1.ff4p+9,
+        -0x1.ff8p+9,
+        -0x1.ffcp+9,
+        -0x1p+10,
+    };
     for (int i=0; i < sizeof(vals) / sizeof(vals[0]); i++) {
         float64_t input = vals[i];
         if (input == 0) break;

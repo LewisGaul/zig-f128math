@@ -1,8 +1,3 @@
-// SPDX-License-Identifier: MIT
-// Copyright (c) 2015-2021 Zig Contributors
-// This file is part of [zig](https://ziglang.org/), which is MIT licensed.
-// The MIT license requires this copyright notice to be included in all copies
-// and substantial portions of the software.
 // Ported from musl, which is licensed under the MIT license:
 // https://git.musl-libc.org/cgit/musl/tree/COPYRIGHT
 //
@@ -11,6 +6,12 @@
 
 const std = @import("std");
 const math = std.math;
+const inf_f32 = math.inf_f32;
+const inf_f64 = math.inf_f64;
+const inf_f128 = math.inf_f128;
+const nan_f32 = math.nan_f32;
+const nan_f64 = math.nan_f64;
+const nan_f128 = math.nan_f128;
 const expect = std.testing.expect;
 
 /// Returns 2 raised to the power of x (2^x).
@@ -75,11 +76,11 @@ fn exp2_32(x: f32) f32 {
         }
         // x < -126
         if (u >= 0x80000000) {
-            if (u > 0xC3150000 or u & 0x000FFFF != 0) {
+            if (u >= 0xC3160000 or u & 0x000FFFF != 0) {
                 math.doNotOptimizeAway(-0x1.0p-149 / x);
             }
             // x <= -150
-            if (u > 0xC3150000) {
+            if (u >= 0xC3160000) {
                 return 0;
             }
         }
@@ -400,10 +401,10 @@ fn exp2_64(x: f64) f64 {
         // x <= -1022
         if (ux >> 63 != 0) {
             // underflow
-            if (x < -1074 or x - 0x1.0p52 + 0x1.0p52 != x) {
+            if (x <= -1075 or x - 0x1.0p52 + 0x1.0p52 != x) {
                 math.doNotOptimizeAway(@floatCast(f32, -0x1.0p-149 / x));
             }
-            if (x < -1074) {
+            if (x <= -1075) {
                 return 0;
             }
         }
@@ -737,10 +738,10 @@ fn exp2_128(x: f128) f128 {
         // x <= -1022
         if (x < -16382) {
             // underflow
-            if (x < -16494 or x - 0x1p112 + 0x1p112 != x) {
+            if (x <= -16495 or x - 0x1p112 + 0x1p112 != x) {
                 math.doNotOptimizeAway(@floatCast(f32, -0x1.0p-149 / x));
             }
-            if (x < -16494) {
+            if (x <= -16495) {
                 return 0;
             }
         }

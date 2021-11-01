@@ -45,12 +45,22 @@ const test_cases = [_]TestValue{
 
     // Some boundary cases specific to exp2
     Test( 0x1.fffffffffffffp+9,    0x1.ffffffffffd3ap+1023 ), // The last value before the exp gets infinite
+    Test( 0x1.fff3333333333p+9,    0x1.ddb680117aa8ep+1023 ),
     Test( 0x1p+10,                 inf_f64                 ), // The first value that gives infinite exp
-    Test(-0x1.0c8p+10,             0x1p-1074               ), // The last value before the exp flushes to zero
-    Test(-0x1.0c80000000001p+10,   0x0p+0                  ), // The first value at which the exp flushes to zero
+    Test( 0x1.0006666666666p+10,   inf_f64                 ),
+    Test(-0x1.0cbffffffffffp+10,   0x1p-1074               ), // The last value before the exp flushes to zero
+    Test(-0x1.0c8p+10,             0x1p-1074               ),
+    Test(-0x1.0cap+10,             0x1p-1074               ),
+    Test(-0x1.0ccp+10,             0x0p+0                  ), // The first value at which the exp flushes to zero
+    Test(-0x1p+11,                 0x0p+0                  ),
     Test(-0x1.ffp+9,               0x1p-1022               ), // The last value before the exp flushes to subnormal
+    Test(-0x1.fef3333333333p+9,    0x1.125fbee2506b0p-1022 ),
     Test(-0x1.ff00000000001p+9,    0x1.ffffffffffd3ap-1023 ), // The first value for which exp flushes to subnormal
+    Test(-0x1.ff0cccccccccdp+9,    0x1.ddb680117aa8ep-1023 ),
+    Test(-0x1.ff4p+9,              0x1.6a09e667f3bccp-1023 ),
     Test(-0x1.ff8p+9,              0x1p-1023               ),
+    Test(-0x1.ffcp+9,              0x1.6a09e667f3bccp-1024 ),
+    Test(-0x1p+10,                 0x1p-1024               ),
 
     // zig fmt: on
 };

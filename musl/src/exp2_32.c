@@ -135,10 +135,16 @@ exp2f (float32_t x)
 int
 main ()
 {
-    float32_t vals[10] = {
+    float32_t vals[32] = {
 		1, 2, -1, 0.5, 0.511,
+		 0x1.fffffep+6,
+		 0x1.ff999ap+6,
+		 0x1p+7,
+		 0x1.003334p+7,
+		-0x1.2bccccp+7,
 		-0x1.2ap+7,
-		-0x1.2a0002p+7,
+		-0x1.2cp+7,
+		-0x1.2c3334p+7,
 		-0x1.f8p+6,
 		-0x1.f80002p+6,
 		-0x1.fcp+6,
