@@ -48,7 +48,7 @@ Note the following exceptions defined in IEEE-754: <https://www.gnu.org/software
 
 ## Implementation of maths functions
 
-The Zig issue tracking addition of support for `f128` in the stdlib maths functions is [#40126](https://github.com/ziglang/zig/issues/4026). The original issue that tracked the initial work is [#374](https://github.com/ziglang/zig/issues/374), and the work was done on [tiehuis/zig-fmath](https://github.com/tiehuis/zig-fmath).
+The Zig issue tracking addition of support for `f128` in the stdlib maths functions is [#4026](https://github.com/ziglang/zig/issues/4026). The original issue that tracked the initial work is [#374](https://github.com/ziglang/zig/issues/374), and the work was done on [tiehuis/zig-fmath](https://github.com/tiehuis/zig-fmath).
 
 Inspiration taken from:
 - Zig: [lib/std/math/](https://github.com/ziglang/zig/tree/master/lib/std/math)
@@ -268,6 +268,18 @@ Used by:
 
 Return the result of `e` raised to the given argument.
 
+We approach this as follows:
+- Handle special cases:
+  - `exp(nan) -> nan`
+  - `exp(+inf) -> +inf`
+  - `exp(-inf) -> 0`
+  - Input is sufficiently large/small such that we get an overflow/underflow (to `inf` or `0`)
+- Reduce to `r` such that `|r| <= 0.5*ln2`, `x = k*ln2 + r`
+- Approximate solution using Chebyshev polynomial on a narrowed range
+
+Single and double precision are implemented based on the *old* Musl implementation (mid Sept 2017), which appeared to be based on FreeBSD. There is a new implementation in Musl based on <https://github.com/ARM-software/optimized-routines> (for single/double precision only) since 2017/18.
+
+Quadruple precision will be based on FreeBSD (Musl appears to be missing a working implementation).
 
 #### GCC approach
 
@@ -301,3 +313,31 @@ where:
 - `n_1 + n_0 = n`, so that `|n_0| < -FLT128_MIN_EXP-1`
 
 In most cases `n_1 == 0`, meaning there is a multiplication that can be omitted.
+
+#### Musl approach
+
+[single precision](https://git.musl-libc.org/cgit/musl/tree/src/math/expf.c)
+
+Using a different method to others - based on <https://github.com/ARM-software/optimized-routines/tree/master/math> (since commit `3f94c648`, 2017). Claims to achieve 1.8x with `-O3` for `expf()` (not as good for `exp2()`).
+
+[double precision](https://git.musl-libc.org/cgit/musl/tree/src/math/exp.c)
+
+Also based on the above (since commit `e16f7b3c0`, 2018). Claims to achieve similar (slightly better) improvements to single precision.
+
+[quadruple precision](https://git.musl-libc.org/cgit/musl/tree/src/math/expl.c)
+
+The implementation of quadruple precision comes from OpenBSD - implementation depends on choice of format for `long double` via a `#ifdef`, but seems to be missing a proper f128 implementation...).
+
+#### FreeBSD approach
+
+[single precision](https://cgit.freebsd.org/src/tree/lib/msun/src/e_expf.c)
+
+[double precision](https://cgit.freebsd.org/src/tree/lib/msun/src/e_exp.c)
+
+[quadruple precision](https://cgit.freebsd.org/src/tree/lib/msun/ld128/s_expl.c)
+
+#### Go approach
+
+<https://github.com/golang/go/blob/master/src/math/exp.go>
+
+Appears to be based on Sun Microsystems. Only has double precision implementation, doesn't use table of values?
