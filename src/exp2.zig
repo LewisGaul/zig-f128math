@@ -6,12 +6,6 @@
 
 const std = @import("std");
 const math = std.math;
-const inf_f32 = math.inf_f32;
-const inf_f64 = math.inf_f64;
-const inf_f128 = math.inf_f128;
-const nan_f32 = math.nan_f32;
-const nan_f64 = math.nan_f64;
-const nan_f128 = math.nan_f128;
 const expect = std.testing.expect;
 
 /// Returns 2 raised to the power of x (2^x).
