@@ -433,20 +433,28 @@ main ()
 		-0x1p+14Q,
 		 0x1p-16384Q,
 	};
+
+    char buf[256];
     for (int i=0; i < sizeof(vals) / sizeof(vals[0]); i++) {
         float128_t input = vals[i];
         if (input == 0) break;
         uint128_t input_bits = *(uint128_t*)(&input);
-        printf("IN:  "HEX128"  %f\n",
+        printf("IN:  "HEX128,
                (uint64_t)(input_bits >> 64),
-               (uint64_t)input_bits,
-               (float64_t)input);
+               (uint64_t)input_bits);
+        quadmath_snprintf(buf, sizeof(buf), "%+-Qf", input);
+        printf("  %s", buf);
+        quadmath_snprintf(buf, sizeof(buf), "%+-Qa", input);
+        printf("  %s\n", buf);
 
         float128_t output = exp2q(input);
         uint128_t output_bits = *(uint128_t*)(&output);
-        printf("OUT: "HEX128"  %f\n\n",
+        printf("OUT: "HEX128,
                (uint64_t)(output_bits >> 64),
-               (uint64_t)output_bits,
-               (float64_t)output);
+               (uint64_t)output_bits);
+        quadmath_snprintf(buf, sizeof(buf), "%+-Qf", input);
+        printf("  %s", buf);
+        quadmath_snprintf(buf, sizeof(buf), "%+-Qa", input);
+        printf("  %s\n", buf);
     }
 }

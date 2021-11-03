@@ -429,9 +429,9 @@ main ()
         float64_t input = vals[i];
         if (input == 0) break;
         uint64_t input_bits = *(uint64_t*)(&input);
-        printf("IN:  "HEX64"  %f  %a\n", input_bits, input, input);
+        printf("IN:  "HEX64"  %+-f  %+-a\n", input_bits, input, input);
         float64_t output = exp2(input);
         uint64_t output_bits = *(uint64_t*)(&output);
-        printf("OUT: "HEX64"  %f  %a\n\n", output_bits, output, output);
+        printf("OUT: "HEX64"  %+-f  %+-a\n\n", output_bits, output, output);
     }
 }

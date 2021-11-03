@@ -153,9 +153,9 @@ main ()
         float32_t input = vals[i];
         if (input == 0) break;
         uint32_t input_bits = *(uint32_t*)(&input);
-        printf("IN:  "HEX32"  %f  %a\n", input_bits, input, input);
+        printf("IN:  "HEX32"  %+-f  %+-a\n", input_bits, input, input);
         float32_t output = exp2f(input);
         uint32_t output_bits = *(uint32_t*)(&output);
-        printf("OUT: "HEX32"  %f  %a\n\n", output_bits, output, output);
+        printf("OUT: "HEX32"  %+-f  %+-a\n\n", output_bits, output, output);
     }
 }
