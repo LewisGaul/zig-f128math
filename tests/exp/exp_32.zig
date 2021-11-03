@@ -22,8 +22,6 @@ const test_cases = [_]TestValue{
     // Special cases
     Test( 0x0p+0,   0x1p+0  ),
     Test(-0x0p+0,   0x1p+0  ),
-    Test( 0x1p+0,   0x1p+1  ),
-    Test(-0x1p+0,   0x1p-1  ),
     Test( inf_f32,  inf_f32 ),
     Test(-inf_f32,  0x0p+0  ),
     Test( nan_f32,  nan_f32 ),
@@ -32,6 +30,16 @@ const test_cases = [_]TestValue{
     Test( @bitCast(f32, @as(u32, 0xfff01234)),  nan_f32 ),
 
     // Sanity cases
+    Test(-0x1.0223a0p+3,  0x1.490320p-12 ),
+    Test( 0x1.161868p+2,  0x1.34712ap+6  ),
+    Test(-0x1.0c34b4p+3,  0x1.e06b1ap-13 ),
+    Test(-0x1.a206f0p+2,  0x1.7dd484p-10 ),
+    Test( 0x1.288bbcp+3,  0x1.4abc80p+13 ),
+    Test( 0x1.52efd0p-1,  0x1.f04a9cp+0  ),
+    Test(-0x1.a05cc8p-2,  0x1.54f1e0p-1  ),
+    Test( 0x1.1f9efap-1,  0x1.c0f628p+0  ),
+    Test( 0x1.8c5db0p-1,  0x1.1599b2p+1  ),
+    Test(-0x1.5b86eap-1,  0x1.03b572p-1  ),
 
     // Some boundary cases specific to exp2
     // Test( 0x1.fffffep+6,   0x1.ffff4ep+127 ), // The last value before the exp gets infinite

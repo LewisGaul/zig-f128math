@@ -37,7 +37,7 @@ fn exp32(x_: f32) f32 {
     hx &= 0x7FFFFFFF;
 
     if (math.isNan(x)) {
-        return x;
+        return math.nan(f32);
     }
 
     // |x| >= -87.33655 or nan
@@ -116,7 +116,7 @@ fn exp64(x_: f64) f64 {
     hx &= 0x7FFFFFFF;
 
     if (math.isNan(x)) {
-        return x;
+        return math.nan(f64);
     }
 
     // |x| >= 708.39 or nan
