@@ -276,6 +276,11 @@ We approach this as follows:
   - Input is sufficiently large/small such that we get an overflow/underflow (to `inf` or `0`)
 - Reduce to `r` such that `|r| <= 0.5*ln2`, `x = k*ln2 + r`
 - Approximate solution using Chebyshev polynomial on a narrowed range
+- Scale up with `scalbn()`, which implements `x * 2^k` for integer exponent
+
+This appears to be approached slightly differently to `exp2()` (and does not call out to `exp2()` in general, using `scalbn()` instead) - there are less tables of values and narrowing is done on a smaller range? Although it seems a table of values *is* needed for 128-bit floats to achieve the required precision...
+
+This article may be of interest: <https://www.pseudorandom.com/implementing-exp>.
 
 Single and double precision are implemented based on the *old* Musl implementation (mid Sept 2017), which appeared to be based on FreeBSD. There is a new implementation in Musl based on <https://github.com/ARM-software/optimized-routines> (for single/double precision only) since 2017/18.
 
