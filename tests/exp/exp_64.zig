@@ -39,14 +39,29 @@ const test_cases = [_]TestValue{
     Test( 0x1.1f9ef934745cbp-1,  0x1.c0f6266a6a547p+0  ),
     Test( 0x1.8c5db097f7442p-1,  0x1.1599b1d4a25fbp+1  ),
     Test(-0x1.5b86ea8118a0ep-1,  0x1.03b5728a00229p-1  ),
+    Test(-0x1.57f25b2b5006dp+2,  0x1.2fbea6a01cab9p-8  ),
+    Test( 0x1.c7d30fb825911p+3,  0x1.76eeed45a0634p+20 ),
+    Test( 0x1.19be709de7505p+4,  0x1.52d3eb7be6844p+25 ),
+    Test(-0x1.ab6d6fba96889p+3,  0x1.a88ae12f985d6p-20 ),
+    Test(-0x1.5ac18e27084ddp+2,  0x1.22b327da9cca6p-8  ),
+    Test(-0x1.925981b093c41p-1,  0x1.d2acc046b55f7p-2  ),
+    Test( 0x1.7221cd18455f5p+3,  0x1.9c2cde8699cfbp+16 ),
+    Test( 0x1.11a0d4a51b239p+4,  0x1.980ef612ff182p+24 ),
+    Test(-0x1.ae41a1079de4dp+1,  0x1.1c28d16bb3222p-5  ),
+    Test(-0x1.329153103b871p+4,  0x1.47efa6ddd0d22p-28 ),
 
     // Boundary cases
-    // Test( 0x1.62e42fefa39efp+9,    0x1.fffffffffff2ap+1023 ), // The last value before the exp gets infinite
-    // Test( 0x1.62e42fefa39fp+9,     inf_f64                 ), // The first value that gives infinite exp
-    // Test(-0x1.74910d52d3051p+9,    0x1p-1074               ), // The last value before the exp flushes to zero
-    // Test(-0x1.74910d52d3052p+9,    0x0p+0                  ), // The first value at which the exp flushes to zero
-    // Test(-0x1.6232bdd7abcd2p+9,    0x1.000000000007cp-1022 ), // The last value before the exp flushes to subnormal
-    // Test(-0x1.6232bdd7abcd3p+9,    0x1.ffffffffffcf8p-1023 ), // The first value for which exp flushes to subnormal
+    Test( 0x1.62e42fefa39efp+9,    0x1.fffffffffff2ap+1023 ), // The last value before the exp gets infinite
+    Test( 0x1.62e42fefa39f0p+9,    inf_f64                 ), // The first value that gives infinite exp
+    Test( 0x1.fffffffffffffp+127,  inf_f64                 ), // Max input value
+    Test( 0x1p-1074,               0x1p+0                  ), // Tiny input values
+    Test(-0x1p-1074,               0x1p+0                  ),
+    Test( 0x1p-1022,               0x1p+0                  ),
+    Test(-0x1p-1022,               0x1p+0                  ),
+    Test(-0x1.74910d52d3051p+9,    0x1p-1074               ), // The last value before the exp flushes to zero
+    Test(-0x1.74910d52d3052p+9,    0x0p+0                  ), // The first value at which the exp flushes to zero
+    Test(-0x1.6232bdd7abcd2p+9,    0x1.000000000007cp-1022 ), // The last value before the exp flushes to subnormal
+    Test(-0x1.6232bdd7abcd3p+9,    0x1.ffffffffffcf8p-1023 ), // The first value for which exp flushes to subnormal
 
     // zig fmt: on
 };
@@ -68,11 +83,11 @@ test {
             "out:   {[0]x:<24}  {[0]e:<24} 0x{[1]x:0<16}\n",
             .{ output, output_bits },
         );
-        print(
-            "exp:   {[0]x:<24}  {[0]e:<24} 0x{[1]x:0<16}\n",
-            .{ tc.exp_output, exp_output_bits },
-        );
         if (output_bits != exp_output_bits) {
+            print(
+                "exp:   {[0]x:<24}  {[0]e:<24} 0x{[1]x:0<16}\n",
+                .{ tc.exp_output, exp_output_bits },
+            );
             print("FAILED\n", .{});
             failure = true;
         }

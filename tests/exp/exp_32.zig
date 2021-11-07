@@ -40,19 +40,29 @@ const test_cases = [_]TestValue{
     Test( 0x1.1f9efap-1,  0x1.c0f628p+0  ),
     Test( 0x1.8c5db0p-1,  0x1.1599b2p+1  ),
     Test(-0x1.5b86eap-1,  0x1.03b572p-1  ),
+    Test(-0x1.57f25cp+2,  0x1.2fbea2p-8  ),
+    Test( 0x1.c7d310p+3,  0x1.76eefp+20  ),
+    Test( 0x1.19be70p+4,  0x1.52d3dep+25 ),
+    Test(-0x1.ab6d70p+3,  0x1.a88adep-20 ),
+    Test(-0x1.5ac18ep+2,  0x1.22b328p-8  ),
+    Test(-0x1.925982p-1,  0x1.d2acc0p-2  ),
+    Test( 0x1.7221cep+3,  0x1.9c2ceap+16 ),
+    Test( 0x1.11a0d4p+4,  0x1.980ee6p+24 ),
+    Test(-0x1.ae41a2p+1,  0x1.1c28d0p-5  ),
+    Test(-0x1.329154p+4,  0x1.47ef94p-28 ),
 
     // Some boundary cases specific to exp2
-    // Test( 0x1.fffffep+6,   0x1.ffff4ep+127 ), // The last value before the exp gets infinite
-    // Test( 0x1.ff999ap+6,   0x1.ddb6a2p+127 ),
-    // Test( 0x1p+7,          inf_f32         ), // The first value that gives infinite exp
-    // Test( 0x1.003334p+7,   inf_f32         ),
-    // Test(-0x1.2bccccp+7,   0x1p-149        ), // The last value before the exp flushes to zero
-    // Test(-0x1.2ap+7,       0x1p-149        ),
-    // Test(-0x1.2cp+7,       0x0p+0          ), // The first value at which the exp flushes to zero
-    // Test(-0x1.2c3334p+7,   0x0p+0          ),
-    // Test(-0x1.f8p+6,       0x1p-126        ), // The last value before the exp flushes to subnormal
-    // Test(-0x1.f80002p+6,   0x1.ffff5p-127  ), // The first value for which exp flushes to subnormal
-    // Test(-0x1.fcp+6,       0x1p-127        ),
+    Test( 0x1.62e42ep+6,   0x1.ffff08p+127 ), // The last value before the exp gets infinite
+    Test( 0x1.62e430p+6,   inf_f32         ), // The first value that gives infinite exp
+    Test( 0x1.fffffep+127, inf_f32         ), // Max input value
+    Test( 0x1p-149,        0x1p+0          ), // Tiny input values
+    Test(-0x1p-149,        0x1p+0          ),
+    Test( 0x1p-126,        0x1p+0          ),
+    Test(-0x1p-126,        0x1p+0          ),
+    Test(-0x1.9fe368p+6,   0x1p-149        ), // The last value before the exp flushes to zero
+    Test(-0x1.9fe36ap+6,   0x0p+0          ), // The first value at which the exp flushes to zero
+    Test(-0x1.5d589ep+6,   0x1.00004cp-126 ), // The last value before the exp flushes to subnormal
+    Test(-0x1.5d58a0p+6,   0x1.ffff98p-127 ), // The first value for which exp flushes to subnormal
 
     // zig fmt: on
 };
