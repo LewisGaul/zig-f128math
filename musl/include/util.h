@@ -39,20 +39,20 @@ typedef __float128   float128_t;
 } while(0)
 
 
-/* Get a 32 bit int from a float.  */
-#define GET_FLOAT_WORD(w,d)                       \
-do {                                              \
-  union {float32_t f; uint32_t i;} __u;           \
-  __u.f = (d);                                    \
-  (w) = __u.i;                                    \
-} while (0)
-
-/* Get the more significant 32 bit int from a double.  */
-#define GET_HIGH_WORD(hi,d)                       \
-do {                                              \
-  union {float64_t f; uint64_t i;} __u;           \
-  __u.f = (d);                                    \
-  (hi) = __u.i >> 32;                             \
-} while (0)
+/* From FreeBSD's fpmath.h */
+union IEEEl2bits {
+  float128_t e;
+  struct {
+    unsigned long manl  :64;
+    unsigned long manh  :48;
+    unsigned int  exp   :15;
+    unsigned int  sign  :1;
+  } bits;
+  struct {
+    unsigned long manl     :64;
+    unsigned long manh     :48;
+    unsigned int  expsign  :16;
+  } xbits;
+};
 
 #endif  // UTIL_H

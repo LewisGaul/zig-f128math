@@ -452,9 +452,9 @@ main ()
         printf("OUT: "HEX128,
                (uint64_t)(output_bits >> 64),
                (uint64_t)output_bits);
-        quadmath_snprintf(buf, sizeof(buf), "%+-Qf", input);
+        quadmath_snprintf(buf, sizeof(buf), "%+-Qf", output);
         printf("  %s", buf);
-        quadmath_snprintf(buf, sizeof(buf), "%+-Qa", input);
-        printf("  %s\n", buf);
+        quadmath_snprintf(buf, sizeof(buf), "%+-Qa", output);
+        printf("  %s\n\n", buf);
     }
 }
