@@ -43,20 +43,16 @@ const test_cases = [_]TestValue{
     Test(-0x1.5b86ea8118a0e2bcp-1,  0x1.03b5728a0022870d16a9c4217353p-1  ),
 
     // Boundary cases
-    // Test( 0x1p+14 - 0x1p-99,        0x1.ffffffffffffffffffffffffd3a3p+16383 ), // The last value before the exp gets infinite
-    // Test( 0x1.ffff333333333334p+13, 0x1.ddb680117ab141f6da98f76d6b72p+16383 ),
-    // Test( 0x1p+14,                  inf_f128                                ), // The first value that gives infinite exp
-    // Test( 0x1.0000666666666666p+14, inf_f128                                ),
-    // Test(-0x1.01bcp+14 + 0x1p-98,   0x1p-16494                              ), // The last value before the exp flushes to zero
-    // Test(-0x1.00f799999999999ap+14, 0x1.125fbee25066p-16446                 ),
-    // Test(-0x1.01bcp+14,             0x0p+0                                  ), // The first value at which the exp flushes to zero
+    Test( 0x1.62e42fefa39ef35793c7673007e5p+13,   0x1.ffffffffffffffffffffffffc4a8p+16383 ), // The last value before the exp gets infinite
+    Test( 0x1.62e42fefa39ef35793c7673007e6p+13,   inf_f128                                ), // The first value that gives infinite exp
+    Test(-0x1.654bb3b2c73ebb059fabb506ff33p+13,   0x1p-16494                              ), // The last value before the exp flushes to zero
+    Test(-0x1.654bb3b2c73ebb059fabb506ff34p+13,   0x0p+0                                  ), // The first value at which the exp flushes to zero
     // Test(-0x1.fffp+13,              0x1p-16382                              ), // The last value before the exp flushes to subnormal
     // Test(-0x1.fffp+13 - 0x1p-99,    0x0.ffffffffffffffffffffffffe9d2p-16382 ), // The first value for which exp flushes to subnormal
     // Test(-0x1.fff4p+13,             0x1.6a09e667f3bcc908b2fb1366ea94p-16383 ),
     // Test(-0x1.fff8p+13,             0x1p-16383                              ),
     // Test(-0x1.fffcp+13,             0x1.6a09e667f3bcc908b2fb1366ea94p-16384 ),
     // Test(-0x1p+14,                  0x1p-16384                              ),
-    // Test( 0x1p-16384,               0x1p+0                                  ), // Very close to zero
 
     // zig fmt: on
 };

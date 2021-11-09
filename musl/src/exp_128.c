@@ -351,7 +351,7 @@ expq (float128_t x)
 int
 main ()
 {
-    float128_t vals[32] = {
+    float128_t vals[64] = {
 		1, 2, -1, 0.5, 0.511,
         // Sanity
         -0x1.02239f3c6a8f13dep+3Q,
@@ -364,6 +364,11 @@ main ()
          0x1.1f9ef934745cad60p-1Q,
          0x1.8c5db097f744257ep-1Q,
         -0x1.5b86ea8118a0e2bcp-1Q,
+        // Boundary
+         0x1.62e42fefa39ef35793c7673007e5p+13Q,
+         0x1.62e42fefa39ef35793c7673007e6p+13Q,
+        -0x1.654bb3b2c73ebb059fabb506ff33p+13Q,
+        -0x1.654bb3b2c73ebb059fabb506ff34p+13Q,
 	};
 
     char buf[256];
