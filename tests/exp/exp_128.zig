@@ -47,12 +47,8 @@ const test_cases = [_]TestValue{
     Test( 0x1.62e42fefa39ef35793c7673007e6p+13,   inf_f128                                ), // The first value that gives infinite exp
     Test(-0x1.654bb3b2c73ebb059fabb506ff33p+13,   0x1p-16494                              ), // The last value before the exp flushes to zero
     Test(-0x1.654bb3b2c73ebb059fabb506ff34p+13,   0x0p+0                                  ), // The first value at which the exp flushes to zero
-    // Test(-0x1.fffp+13,              0x1p-16382                              ), // The last value before the exp flushes to subnormal
-    // Test(-0x1.fffp+13 - 0x1p-99,    0x0.ffffffffffffffffffffffffe9d2p-16382 ), // The first value for which exp flushes to subnormal
-    // Test(-0x1.fff4p+13,             0x1.6a09e667f3bcc908b2fb1366ea94p-16383 ),
-    // Test(-0x1.fff8p+13,             0x1p-16383                              ),
-    // Test(-0x1.fffcp+13,             0x1.6a09e667f3bcc908b2fb1366ea94p-16384 ),
-    // Test(-0x1p+14,                  0x1p-16384                              ),
+    Test(-0x1.62d918ce2421d65ff90ac8f4ce65p+13,   0x1.00000000000000000000000015c6p-16382 ), // The last value before the exp flushes to subnormal
+    Test(-0x1.62d918ce2421d65ff90ac8f4ce66p+13,   0x1.ffffffffffffffffffffffffeb8cp-16383 ), // The first value for which exp flushes to subnormal
 
     // zig fmt: on
 };

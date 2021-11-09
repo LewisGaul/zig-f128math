@@ -371,7 +371,9 @@ main ()
          0x1.62e42fefa39ef35793c7673007e6p+13Q,
         -0x1.654bb3b2c73ebb059fabb506ff33p+13Q,
         -0x1.654bb3b2c73ebb059fabb506ff34p+13Q,
-        -11355.137111933024058873096613727848253Q,
+        -0x1.62d918ce2421d65ff90ac8f4ce65p+13Q,
+        -0x1.62d918ce2421d65ff90ac8f4ce66p+13Q,
+         0x1.ffffffffffffffffffffffffeb8cp-16383Q,
 	};
 
     char buf[256];
