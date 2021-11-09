@@ -182,13 +182,62 @@ fn exp64(x_: f64) f64 {
     }
 }
 
-fn exp128(x_: f128) f128 {
-    return math.nan(f128);
+fn exp128(x: f128) f128 {
+    // const half = [_]f64{ 0.5, -0.5 };
+    // const ln2hi: f64 = 6.93147180369123816490e-01;
+    // const ln2lo: f64 = 1.90821492927058770002e-10;
+    // const invln2: f64 = 1.44269504088896338700e+00;
+    // const P1: f64 = 1.66666666666666019037e-01;
+    // const P2: f64 = -2.77777777770155933842e-03;
+    // const P3: f64 = 6.61375632143793436117e-05;
+    // const P4: f64 = -1.65339022054652515390e-06;
+    // const P5: f64 = 4.13813679705723846039e-08;
+
+    // Last values before overflow/underflow/subnormal.
+    const o_threshold = 11356.523406294143949491931077970763428; // 0x1.62e42fefa39ef35793c7673007e5p+13
+    const u_threshold = -11433.462743336297878837243843452621503; // -0x1.654bb3b2c73ebb059fabb506ff33p+13
+    const s_threshold = -11355.137111933024058873096613727848253; // -0x1.62d918ce2421d65ff90ac8f4ce65p+13
+
+    const ux: u128 = @bitCast(u128, x);
+    var hx: u32 = @intCast(u32, ux >> 96);
+    const sign = @intCast(i32, hx >> 31);
+    hx &= 0x7FFFFFFF;
+
+    if (math.isNan(x)) {
+        return math.nan(f128);
+    }
+
+    // |x| >= 11355.1371... or NaN
+    if (hx >= 0x400C62D9) {
+        // NaN
+        if (hx > 0x7FFF0000) {
+            return x;
+        }
+        if (x > o_threshold) {
+            // overflow if x != inf
+            if (!math.isInf(x)) {
+                math.raiseOverflow();
+            }
+            return math.inf(f128);
+        }
+        if (x < s_threshold) {
+            // underflow if x != -inf
+            // math.doNotOptimizeAway(@as(f32, -0x1.0p-149 / x));
+            if (!math.isInf(x)) {
+                math.raiseUnderflow();
+            }
+            if (x < u_threshold) {
+                return 0;
+            }
+        }
+    }
+    return 0; // TODO
 }
 
 test "math.exp" {
     try expect(exp(@as(f32, 0.0)) == exp32(0.0));
     try expect(exp(@as(f64, 0.0)) == exp64(0.0));
+    try expect(exp(@as(f128, 0.0)) == exp128(0.0));
 }
 
 test "math.exp32" {
@@ -211,6 +260,16 @@ test "math.exp64" {
     try expect(math.approxEqAbs(f64, exp64(1.5), 4.481689, epsilon));
 }
 
+test "math.exp128" {
+    const epsilon = 0.000001;
+
+    try expect(exp128(0.0) == 1.0);
+    try expect(math.approxEqAbs(f128, exp128(0.0), 1.0, epsilon));
+    try expect(math.approxEqAbs(f128, exp128(0.2), 1.221403, epsilon));
+    try expect(math.approxEqAbs(f128, exp128(0.8923), 2.440737, epsilon));
+    try expect(math.approxEqAbs(f128, exp128(1.5), 4.481689, epsilon));
+}
+
 test "math.exp32.special" {
     try expect(math.isPositiveInf(exp32(math.inf(f32))));
     try expect(math.isNan(exp32(math.nan(f32))));
@@ -219,4 +278,9 @@ test "math.exp32.special" {
 test "math.exp64.special" {
     try expect(math.isPositiveInf(exp64(math.inf(f64))));
     try expect(math.isNan(exp64(math.nan(f64))));
+}
+
+test "math.exp128.special" {
+    try expect(math.isPositiveInf(exp128(math.inf(f128))));
+    try expect(math.isNan(exp128(math.nan(f128))));
 }

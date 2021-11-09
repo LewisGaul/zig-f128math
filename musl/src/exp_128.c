@@ -322,7 +322,7 @@ expq (float128_t x)
 		if (x < u_threshold)
 			return (tiny * tiny);
 	} else if (ix < BIAS - 114) {	/* |x| < 0x1p-114 */
-		return (1, x);		/* 1 with inexact iff x != 0 */
+		return (1);		/* 1 with inexact iff x != 0 */
 	}
 
 	// ENTERI();
@@ -351,6 +351,8 @@ expq (float128_t x)
 int
 main ()
 {
+    printf("%d %d %d\n\n", LDBL_MIN_EXP, LDBL_MAX_EXP, BIAS);
+
     float128_t vals[64] = {
 		1, 2, -1, 0.5, 0.511,
         // Sanity
@@ -369,6 +371,7 @@ main ()
          0x1.62e42fefa39ef35793c7673007e6p+13Q,
         -0x1.654bb3b2c73ebb059fabb506ff33p+13Q,
         -0x1.654bb3b2c73ebb059fabb506ff34p+13Q,
+        -11355.137111933024058873096613727848253Q,
 	};
 
     char buf[256];

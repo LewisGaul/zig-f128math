@@ -69,6 +69,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include "math_private.h"
 #include "util.h"
 
 static const float64_t
@@ -156,13 +157,25 @@ main ()
          0x1.1f9ef934745cbp-1,
          0x1.8c5db097f7442p-1,
         -0x1.5b86ea8118a0ep-1,
+        // Boundary
+         0x1.62e42fefa39efp+9,
+         0x1.62e42fefa39f0p+9,
+         0x1.fffffffffffffp+127,
+         0x1p-1074,
+        -0x1p-1074,
+         0x1p-1022,
+        -0x1p-1022,
+        -0x1.74910d52d3051p+9,
+        -0x1.74910d52d3052p+9,
+        -0x1.6232bdd7abcd2p+9,
+        -0x1.6232bdd7abcd3p+9,
     };
     for (int i=0; i < sizeof(vals) / sizeof(vals[0]); i++) {
         float64_t input = vals[i];
         if (input == 0) break;
         uint64_t input_bits = *(uint64_t*)(&input);
         printf("IN:  "HEX64"  %+-f  %+-a\n", input_bits, input, input);
-        float64_t output = exp2(input);
+        float64_t output = exp(input);
         uint64_t output_bits = *(uint64_t*)(&output);
         printf("OUT: "HEX64"  %+-f  %+-a\n\n", output_bits, output, output);
     }
