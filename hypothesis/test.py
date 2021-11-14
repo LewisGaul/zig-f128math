@@ -13,6 +13,7 @@ import sys
 from collections import defaultdict
 
 import hypothesis
+import pytest
 from hypothesis import strategies as st
 
 ROOT_DIR = pathlib.Path("__file__").resolve().parent.parent
@@ -111,10 +112,11 @@ def run_testcase(bits: int, input: int, func: str):
         stderr=subprocess.PIPE,
         universal_newlines=True,
     )
-    if actual_proc.stdout.upper() != exp_proc.stdout.upper():
-        print(f"Expected stderr:\n{exp_proc.stderr}", file=sys.stderr)
-        print(f"Actual stderr:\n{actual_proc.stderr}", file=sys.stderr)
-        assert actual_proc.stdout.upper() == exp_proc.stdout.upper()
+    assert actual_proc.stdout.upper() == exp_proc.stdout.upper()
+    # if actual_proc.stdout.upper() != exp_proc.stdout.upper():
+    #     print(f"Expected stderr:\n{exp_proc.stderr}", file=sys.stderr)
+    #     print(f"Actual stderr:\n{actual_proc.stderr}", file=sys.stderr)
+    #     assert actual_proc.stdout.upper() == exp_proc.stdout.upper()
 
 
 @hypothesis.given(st.one_of(strats[32]["inf"], strats[32]["finite"]))
@@ -159,3 +161,26 @@ def test_exp2_64(input: int):
 @hypothesis.given(st.one_of(strats[128]["inf"], strats[128]["finite"]))
 def test_exp2_128(input: int):
     run_testcase(128, input, "exp2")
+
+
+@hypothesis.given(strats[32]["pos_finite"])
+def test_log2_32(input: int):
+    # TODO: Found failures:
+    #   0x259CAB1E
+    #   0x3FCC01F9
+    #   0x43A9DDD6
+    run_testcase(32, input, "log2")
+
+
+@hypothesis.given(strats[64]["pos_finite"])
+def test_log2_64(input: int):
+    # TODO: Found failures:
+    #   0x0000000000000043
+    #   0x00000000000000D9
+    run_testcase(64, input, "log2")
+
+
+@pytest.mark.skip("log2_128() not implemented in Zig yet")
+@hypothesis.given(strats[128]["pos_finite"])
+def test_log2_128(input: int):
+    run_testcase(128, input, "log2")
