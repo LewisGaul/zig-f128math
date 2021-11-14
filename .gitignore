@@ -9,8 +9,10 @@ zig-build/
 *.out
 exp
 exp2
+log2
 quadmath/exp
 quadmath/exp2
+quadmath/log2
 
 .hypothesis/
 __pycache__/

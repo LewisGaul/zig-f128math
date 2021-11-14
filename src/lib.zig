@@ -60,6 +60,8 @@ pub const inf_f64 = std.math.inf_f64;
 pub const inf_u128 = std.math.inf_u128;
 pub const inf_f128 = std.math.inf_f128;
 
+// pub const nan = std.math.nan;
+// pub const snan = std.math.snan;
 pub const inf = std.math.inf;
 
 pub const isNan = std.math.isNan;
@@ -97,7 +99,7 @@ pub const expm1 = std.math.expm1;
 pub const ilogb = std.math.ilogb;
 pub const ln = std.math.ln;
 pub const log = std.math.log;
-pub const log2 = std.math.log2;
+// pub const log2 = std.math.log2;
 pub const log10 = std.math.log10;
 pub const log1p = std.math.log1p;
 pub const fma = std.math.fma;
@@ -173,6 +175,7 @@ pub const comptimeMod = std.math.comptimeMod;
 // Stuff that's been rewritten/modified within the package.
 pub const exp = @import("exp.zig").exp;
 pub const exp2 = @import("exp2.zig").exp2;
+pub const log2 = @import("log2.zig").log2;
 pub const nan = @import("nan.zig").nan;
 pub const snan = @import("nan.zig").snan;
 
@@ -262,7 +265,8 @@ pub fn singleInputFuncMain(comptime func: @TypeOf(exp)) !void {
         try stdout.print("0x{X:0>32}", .{@bitCast(u128, result)});
     } else {
         std.debug.print(
-            "Unexpected input length {d} - expected a 32 or 64-bit hex int\n",
+            "Unexpected input length {d} - expected a 32, 64, or 128-bit hex int\n",
+            // "Unexpected input length {d} - expected a 32 or 64-bit hex int\n",
             .{input_arg.len},
         );
         return error.InvalidArgs;
