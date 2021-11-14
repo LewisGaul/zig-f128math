@@ -44,12 +44,11 @@ parse_one_arg (const char *arg,
         rc = errno;
         if (rc == 0) {
             low_bits = strtoul(&arg[18], NULL, 16);
+            rc = errno;
         }
-        uint128_t val = ((uint128_t)high_bits << 64) + low_bits;
-        rc = errno;
         if (rc == 0) {
             out_args->float_size = FLOAT_128;
-            out_args->input.u128 = val;
+            out_args->input.u128 = ((uint128_t)high_bits << 64) + low_bits;
         }
     } else {
         fprintf(stderr,
