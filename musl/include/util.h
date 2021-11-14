@@ -11,9 +11,9 @@ typedef float        float32_t;
 typedef double       float64_t;
 typedef __float128   float128_t;
 
-#define HEX32  "0x%08x"
-#define HEX64  "0x%016lx"
-#define HEX128 "0x%016lx%016lx"
+#define HEX32  "0x%08X"
+#define HEX64  "0x%016lX"
+#define HEX128 "0x%016lX%016lX"
 
 
 #define DEBUG_ENABLED 0

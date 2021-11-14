@@ -169,6 +169,10 @@ main ()
         -0x1.74910d52d3052p+9,
         -0x1.6232bdd7abcd2p+9,
         -0x1.6232bdd7abcd3p+9,
+        // Failing cases
+         0x1.17219p-20,
+        -0x1.17219p-20,
+        -0x1.76c276fe94d0fp-16,
     };
     for (int i=0; i < sizeof(vals) / sizeof(vals[0]); i++) {
         float64_t input = vals[i];

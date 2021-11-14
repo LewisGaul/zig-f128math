@@ -104,7 +104,8 @@ def run_testcase(bits: int, input: int, func: str):
 
 @hypothesis.given(st.one_of(strats[32]["inf"], strats[32]["finite"]))
 def test_exp_32(input: int):
-    # TODO: Found failures:
+    # TODO: Found failures, which are present in the version of musl that Zig
+    # copied, but not in latest musl:
     #   0x3E01011A
     #   0x3EBE011C
     #   0x3EBE501C
@@ -123,7 +124,8 @@ def test_exp_32(input: int):
 @hypothesis.given(st.one_of(strats[64]["inf"], strats[64]["finite"]))
 def test_exp_64(input: int):
     hypothesis.assume(not (0x3EB1721900000000 <= input <= 0x3F71DD0666FCF1BC))
-    # TODO: Found failures:
+    # TODO: Found failures, which are *not* present in the version of musl that
+    # Zig copied:
     #   0x3EB1721900000000  ...  0x3F71DD0666FCF1BC
     #   0xBEB1721900000000
     #   0xBEF76C276FE94D0F

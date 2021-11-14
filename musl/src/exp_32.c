@@ -17,6 +17,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include "math_private.h"
 #include "util.h"
 
 static const float32_t
