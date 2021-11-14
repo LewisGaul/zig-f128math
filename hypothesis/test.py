@@ -123,12 +123,6 @@ def test_exp_32(input: int):
 
 @hypothesis.given(st.one_of(strats[64]["inf"], strats[64]["finite"]))
 def test_exp_64(input: int):
-    hypothesis.assume(not (0x3EB1721900000000 <= input <= 0x3F71DD0666FCF1BC))
-    # TODO: Found failures, which are *not* present in the version of musl that
-    # Zig copied:
-    #   0x3EB1721900000000  ...  0x3F71DD0666FCF1BC
-    #   0xBEB1721900000000
-    #   0xBEF76C276FE94D0F
     run_testcase(64, input, "exp")
 
 
