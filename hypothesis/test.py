@@ -9,10 +9,10 @@ Run with pytest.
 
 import pathlib
 import subprocess
+import sys
 from collections import defaultdict
 
 import hypothesis
-import pytest
 from hypothesis import strategies as st
 
 ROOT_DIR = pathlib.Path("__file__").resolve().parent.parent
@@ -97,9 +97,24 @@ for bits in [32, 64, 128]:
 def run_testcase(bits: int, input: int, func: str):
     input_hex = f"0x{{:0{bits // 4}X}}".format(input)
     hypothesis.note(f"Input: {input_hex}")
-    expected = subprocess.check_output([TRUSTED_BIN_DIR / func, input_hex])
-    actual = subprocess.check_output([UNDER_TEST_BIN_DIR / func, input_hex])
-    assert actual.upper() == expected.upper()
+    exp_proc = subprocess.run(
+        [TRUSTED_BIN_DIR / func, input_hex],
+        check=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        universal_newlines=True,
+    )
+    actual_proc = subprocess.run(
+        [UNDER_TEST_BIN_DIR / func, input_hex],
+        check=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        universal_newlines=True,
+    )
+    if actual_proc.stdout.upper() != exp_proc.stdout.upper():
+        print(f"Expected stderr:\n{exp_proc.stderr}", file=sys.stderr)
+        print(f"Actual stderr:\n{actual_proc.stderr}", file=sys.stderr)
+        assert actual_proc.stdout.upper() == exp_proc.stdout.upper()
 
 
 @hypothesis.given(st.one_of(strats[32]["inf"], strats[32]["finite"]))
@@ -126,7 +141,6 @@ def test_exp_64(input: int):
     run_testcase(64, input, "exp")
 
 
-@pytest.mark.skip("exp_128() not implemented in Zig yet")
 @hypothesis.given(st.one_of(strats[128]["inf"], strats[128]["finite"]))
 def test_exp_128(input: int):
     run_testcase(128, input, "exp")

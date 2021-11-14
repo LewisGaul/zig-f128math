@@ -122,21 +122,23 @@ run_single_input_func (args_t               args,
         fprintf(stdout, HEX64, result.u64);
         break;
     case FLOAT_128:
-        printf("IN:  "HEX128,
-               (uint64_t)(args.input.u128 >> 64),
-               (uint64_t)args.input.u128);
+        fprintf(stderr,
+                "IN:  "HEX128,
+                (uint64_t)(args.input.u128 >> 64),
+                (uint64_t)args.input.u128);
         quadmath_snprintf(buf, sizeof(buf), "%+-Qa", args.input.f128);
-        printf("  %s", buf);
+        fprintf(stderr,"  %s", buf);
         quadmath_snprintf(buf, sizeof(buf), "%+-Qf", args.input.f128);
-        printf("  %s\n", buf);
+        fprintf(stderr,"  %s\n", buf);
         result.f128 = funcs.f128(args.input.f128);
-        printf("OUT: "HEX128,
-               (uint64_t)(result.u128 >> 64),
-               (uint64_t)result.u128);
+        fprintf(stderr,
+                "OUT: "HEX128,
+                (uint64_t)(result.u128 >> 64),
+                (uint64_t)result.u128);
         quadmath_snprintf(buf, sizeof(buf), "%+-Qa", result.f128);
-        printf("  %s", buf);
+        fprintf(stderr, "  %s", buf);
         quadmath_snprintf(buf, sizeof(buf), "%+-Qf", result.f128);
-        printf("  %s\n", buf);
+        fprintf(stderr, "  %s\n", buf);
         fprintf(stdout,
                 HEX128,
                 (uint64_t)(result.u128 >> 64),
