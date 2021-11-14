@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <quadmath.h>
+
 #include "util.h"
 
 
@@ -96,18 +98,45 @@ run_single_input_func (args_t               args,
                        single_input_funcs_t funcs)
 {
     anyfloat_t result;
+    char       buf[256];
 
     switch (args.float_size) {
     case FLOAT_32:
+        fprintf(stderr,
+                "IN:  "HEX32"  %+-a  %+-f\n",
+                args.input.u32, args.input.f32, args.input.f32);
         result.f32 = funcs.f32(args.input.f32);
+        fprintf(stderr,
+                "OUT: "HEX32"  %+-a  %+-f\n",
+                result.u32, result.f32, result.f32);
         fprintf(stdout, HEX32, result.u32);
         break;
     case FLOAT_64:
+        fprintf(stderr,
+                "IN:  "HEX64"  %+-a  %+-f\n",
+                args.input.u64, args.input.f64, args.input.f64);
         result.f64 = funcs.f64(args.input.f64);
+        fprintf(stderr,
+                "OUT: "HEX64"  %+-a  %+-f\n",
+                result.u64, result.f64, result.f64);
         fprintf(stdout, HEX64, result.u64);
         break;
     case FLOAT_128:
+        printf("IN:  "HEX128,
+               (uint64_t)(args.input.u128 >> 64),
+               (uint64_t)args.input.u128);
+        quadmath_snprintf(buf, sizeof(buf), "%+-Qa", args.input.f128);
+        printf("  %s", buf);
+        quadmath_snprintf(buf, sizeof(buf), "%+-Qf", args.input.f128);
+        printf("  %s\n", buf);
         result.f128 = funcs.f128(args.input.f128);
+        printf("OUT: "HEX128,
+               (uint64_t)(result.u128 >> 64),
+               (uint64_t)result.u128);
+        quadmath_snprintf(buf, sizeof(buf), "%+-Qa", result.f128);
+        printf("  %s", buf);
+        quadmath_snprintf(buf, sizeof(buf), "%+-Qf", result.f128);
+        printf("  %s\n", buf);
         fprintf(stdout,
                 HEX128,
                 (uint64_t)(result.u128 >> 64),

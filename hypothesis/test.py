@@ -104,8 +104,6 @@ def run_testcase(bits: int, input: int, func: str):
 
 @hypothesis.given(st.one_of(strats[32]["inf"], strats[32]["finite"]))
 def test_exp_32(input: int):
-    # Bug in GCC where signalling NaNs are not converted to quiet NaNs.
-    hypothesis.assume(not (0x7F800002 < input < 0x7FBFFFFF))
     # TODO: Found failures:
     #   0x3E01011A
     #   0x3EBE011C
