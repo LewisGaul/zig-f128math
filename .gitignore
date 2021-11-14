@@ -7,3 +7,11 @@ zig-cache/
 zig-build/
 
 *.out
+exp
+exp2
+quadmath/exp
+quadmath/exp2
+
+.hypothesis/
+__pycache__/
+

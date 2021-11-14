@@ -808,3 +808,7 @@ test "math.exp2_128() basic" {
     try expect(math.approxEqAbs(f128, exp2_128(1.5), 2.828427, epsilon));
     try expect(math.approxEqAbs(f128, exp2_128(-1), 0.5, epsilon));
 }
+
+pub fn main() !void {
+    try @import("f128math").singleInputFuncMain(exp2);
+}

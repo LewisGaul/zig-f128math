@@ -35,17 +35,26 @@ parse_one_arg (const char *arg,
             out_args->float_size = FLOAT_64;
             out_args->input.u64 = val;
         }
-    // } else if (arg_len == 34) {
-    //     uint128_t val = strtoul(arg, NULL, 16);
-    //     rc = errno;
-    //     if (rc == 0) {
-    //         out_args->float_size = FLOAT_128;
-    //         out_args->input.u128 = val;
-    //     }
+    } else if (arg_len == 34) {
+        uint64_t high_bits, low_bits;
+        char *argcpy = strdup(arg);
+        argcpy[18] = '\0';
+        high_bits = strtoul(argcpy, NULL, 16);
+        free(argcpy);
+        rc = errno;
+        if (rc == 0) {
+            low_bits = strtoul(&arg[18], NULL, 16);
+        }
+        uint128_t val = ((uint128_t)high_bits << 64) + low_bits;
+        rc = errno;
+        if (rc == 0) {
+            out_args->float_size = FLOAT_128;
+            out_args->input.u128 = val;
+        }
     } else {
         fprintf(stderr,
-                // "Unexpected input length %d - expected a 32, 64, or 128-bit hex int",
-                "Unexpected input length %d - expected a 32 or 64-bit hex int\n",
+                "Unexpected input length %d - expected a 32, 64, or 128-bit hex int",
+                // "Unexpected input length %d - expected a 32 or 64-bit hex int\n",
                 arg_len);
         rc = 1;
     }
@@ -97,6 +106,13 @@ run_single_input_func (args_t               args,
     case FLOAT_64:
         result.f64 = funcs.f64(args.input.f64);
         fprintf(stdout, HEX64, result.u64);
+        break;
+    case FLOAT_128:
+        result.f128 = funcs.f128(args.input.f128);
+        fprintf(stdout,
+                HEX128,
+                (uint64_t)(result.u128 >> 64),
+                (uint64_t)result.u128);
         break;
     default:
         assert(false);

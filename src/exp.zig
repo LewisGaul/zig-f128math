@@ -284,3 +284,7 @@ test "math.exp128.special" {
     try expect(math.isPositiveInf(exp128(math.inf(f128))));
     try expect(math.isNan(exp128(math.nan(f128))));
 }
+
+pub fn main() !void {
+    try @import("f128math").singleInputFuncMain(exp);
+}
