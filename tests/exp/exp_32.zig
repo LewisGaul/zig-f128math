@@ -1,11 +1,11 @@
 const std = @import("std");
 const print = std.debug.print;
 const testing = std.testing;
-const math = std.math;
-const inf_f32 = math.inf_f32;
-const nan_f32 = math.nan_f32;
 
 const f128math = @import("f128math");
+const math = f128math;
+const inf_f32 = math.inf_f32;
+const nan_f32 = math.qnan_f32;
 
 const TestValue = struct {
     input: f32,

@@ -1,11 +1,11 @@
 const std = @import("std");
 const print = std.debug.print;
 const testing = std.testing;
-const math = std.math;
-const inf_f64 = math.inf_f64;
-const nan_f64 = math.nan_f64;
 
 const f128math = @import("f128math");
+const math = f128math;
+const inf_f64 = math.inf_f64;
+const nan_f64 = math.qnan_f64;
 
 const TestValue = struct {
     input: f64,

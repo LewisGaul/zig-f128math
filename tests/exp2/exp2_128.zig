@@ -1,11 +1,11 @@
 const std = @import("std");
 const print = std.debug.print;
 const testing = std.testing;
-const math = std.math;
-const inf_f128 = math.inf_f128;
-const nan_f128 = math.nan_f128;
 
 const f128math = @import("f128math");
+const math = f128math;
+const inf_f128 = math.inf_f128;
+const nan_f128 = math.qnan_f128;
 
 
 const TestValue = struct {

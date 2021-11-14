@@ -5,7 +5,8 @@
 // https://git.musl-libc.org/cgit/musl/tree/src/math/exp.c
 
 const std = @import("std");
-const math = std.math;
+// const math = std.math;
+const math = @import("lib.zig");
 const expect = std.testing.expect;
 
 /// Returns e raised to the power of x (e^x).
@@ -286,5 +287,5 @@ test "math.exp128.special" {
 }
 
 pub fn main() !void {
-    try @import("f128math").singleInputFuncMain(exp);
+    try @import("lib.zig").singleInputFuncMain(exp);
 }

@@ -5,7 +5,8 @@
 // https://git.musl-libc.org/cgit/musl/tree/src/math/exp2.c
 
 const std = @import("std");
-const math = std.math;
+// const math = std.math;
+const math = @import("lib.zig");
 const expect = std.testing.expect;
 
 /// Returns 2 raised to the power of x (2^x).
@@ -810,5 +811,5 @@ test "math.exp2_128() basic" {
 }
 
 pub fn main() !void {
-    try @import("f128math").singleInputFuncMain(exp2);
+    try @import("lib.zig").singleInputFuncMain(exp2);
 }
