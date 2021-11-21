@@ -8,10 +8,7 @@ pub fn Testcase(
     comptime name: []const u8,
     comptime float_type: type,
 ) type {
-    switch (@typeInfo(float_type)) {
-        .Float => {},
-        else => @compileError("Expected float type"),
-    }
+    if (@typeInfo(float_type) != .Float) @compileError("Expected float type");
 
     return struct {
         const F: type = float_type;
