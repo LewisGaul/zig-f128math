@@ -55,7 +55,7 @@ pub fn Testcase(
                         .{ exp_output_bits, tc.exp_output },
                     );
                 }
-                std.debug.print(
+                print(
                     "FAILURE: expected {s}({x})->{x}, got {x} ({d}-bit)\n",
                     .{ name, tc.input, tc.exp_output, output, bits },
                 );
