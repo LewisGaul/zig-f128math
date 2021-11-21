@@ -811,5 +811,5 @@ test "math.exp2_128() basic" {
 }
 
 pub fn main() !void {
-    try @import("lib.zig").singleInputFuncMain(exp2);
+    try @import("util.zig").singleInputFuncMain(exp2);
 }

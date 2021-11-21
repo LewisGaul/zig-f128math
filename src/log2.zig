@@ -214,5 +214,5 @@ test "math.log2_64().special" {
 }
 
 pub fn main() !void {
-    try @import("lib.zig").singleInputFuncMain(log2);
+    try @import("util.zig").singleInputFuncMain(log2);
 }

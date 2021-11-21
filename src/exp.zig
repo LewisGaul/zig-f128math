@@ -478,5 +478,5 @@ test "math.exp128.special" {
 }
 
 pub fn main() !void {
-    try @import("lib.zig").singleInputFuncMain(exp);
+    try @import("util.zig").singleInputFuncMain(exp);
 }
