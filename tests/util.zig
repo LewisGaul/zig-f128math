@@ -3,59 +3,35 @@ const print = std.debug.print;
 
 const verbose = true;
 
-pub const FloatType = enum {
-    Binary16,
-    Binary32,
-    Binary64,
-    Binary128,
-    // CLongDouble,
-
-    pub fn bits(self: @This()) u8 {
-        return switch (self) {
-            .Binary16 => 16,
-            .Binary32 => 32,
-            .Binary64 => 64,
-            .Binary128 => 128,
-            // .CLongDouble => @compileError("c_longdouble not yet supported"),
-        };
-    }
-
-    pub fn ftype(self: @This()) type {
-        // TODO: Get this added to std?
-        // return std.meta.Float(self.bits());
-        return @Type(.{ .Float = .{ .bits = self.bits() } });
-    }
-
-    pub fn utype(self: @This()) type {
-        return std.meta.Int(.unsigned, self.bits());
-    }
-};
-
 pub fn Testcase(
     comptime func: @TypeOf(std.math.exp),
     comptime name: []const u8,
-    comptime float_type: FloatType,
+    comptime float_type: type,
 ) type {
-    return struct {
-        const f: FloatType = float_type;
+    switch (@typeInfo(float_type)) {
+        .Float => {},
+        else => @compileError("Expected float type"),
+    }
 
-        input: f.ftype(),
-        exp_output: f.ftype(),
+    return struct {
+        const F: type = float_type;
+
+        input: F,
+        exp_output: F,
+
+        const bits = std.meta.bitCount(F);
+        const U: type = std.meta.Int(.unsigned, bits);
 
         pub fn run(tc: @This()) !void {
-            const hex_bits_fmt_size = switch (f) {
-                .Binary16 => "4",
-                .Binary32 => "8",
-                .Binary64 => "16",
-                .Binary128 => "32",
+            const hex_bits_fmt_size = comptime std.fmt.comptimePrint("{d}", .{bits / 4});
+            const hex_float_fmt_size = switch (bits) {
+                16 => "10",
+                32 => "16",
+                64 => "24",
+                128 => "40",
+                else => unreachable,
             };
-            const hex_float_fmt_size = switch (f) {
-                .Binary16 => "10",
-                .Binary32 => "16",
-                .Binary64 => "24",
-                .Binary128 => "40",
-            };
-            const input_bits = @bitCast(f.utype(), tc.input);
+            const input_bits = @bitCast(U, tc.input);
             if (verbose) {
                 print(
                     " IN:  0x{X:0>" ++ hex_bits_fmt_size ++ "}  " ++
@@ -64,7 +40,7 @@ pub fn Testcase(
                 );
             }
             const output = func(tc.input);
-            const output_bits = @bitCast(f.utype(), output);
+            const output_bits = @bitCast(U, output);
             if (verbose) {
                 print(
                     "OUT:  0x{X:0>" ++ hex_bits_fmt_size ++ "}  " ++
@@ -72,7 +48,7 @@ pub fn Testcase(
                     .{ output_bits, output },
                 );
             }
-            const exp_output_bits = @bitCast(f.utype(), tc.exp_output);
+            const exp_output_bits = @bitCast(U, tc.exp_output);
             // Compare bits rather than values so that NaN compares correctly.
             if (output_bits != exp_output_bits) {
                 if (verbose) {
@@ -84,7 +60,7 @@ pub fn Testcase(
                 }
                 std.debug.print(
                     "FAILURE: expected {s}({x})->{x}, got {x} ({d}-bit)\n",
-                    .{ name, tc.input, tc.exp_output, output, f.bits() },
+                    .{ name, tc.input, tc.exp_output, output, bits },
                 );
                 return error.TestExpectedEqual;
             }

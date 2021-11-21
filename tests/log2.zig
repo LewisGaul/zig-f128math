@@ -16,9 +16,9 @@ const nan_f128 = math.qnan_f128;
 
 const test_util = @import("util.zig");
 
-const TestcaseLog2_32 = test_util.Testcase(math.log2, "log2", .Binary32);
-const TestcaseLog2_64 = test_util.Testcase(math.log2, "log2", .Binary64);
-const TestcaseLog2_128 = test_util.Testcase(math.log2, "log2", .Binary128);
+const TestcaseLog2_32 = test_util.Testcase(math.log2, "log2", f32);
+const TestcaseLog2_64 = test_util.Testcase(math.log2, "log2", f64);
+const TestcaseLog2_128 = test_util.Testcase(math.log2, "log2", f128);
 
 fn tc32(input: f32, exp_output: f32) TestcaseLog2_32 {
     return .{ .input = input, .exp_output = exp_output };
