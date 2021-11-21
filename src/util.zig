@@ -1,4 +1,6 @@
-pub fn singleInputFuncMain(comptime func: @TypeOf(exp)) !void {
+const std = @import("std");
+
+pub fn singleInputFuncMain(comptime func: @TypeOf(std.math.exp)) !void {
     var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
     defer arena.deinit();
 
