@@ -55,4 +55,22 @@ union IEEEl2bits {
   } xbits;
 };
 
+static inline float32_t
+float32FromBits(uint32_t x)
+{
+    return *(float32_t *)&x;
+}
+
+static inline float64_t
+float64FromBits(uint64_t x)
+{
+    return *(float64_t *)&x;
+}
+
+static inline float128_t
+float128FromBits(uint128_t x)
+{
+    return *(float128_t *)&x;
+}
+
 #endif  // UTIL_H

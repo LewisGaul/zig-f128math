@@ -109,6 +109,9 @@ main ()
         // Boundary
          0x1.62e42ep+6,
          0x1.62e430p+6,
+        // Special
+        float32FromBits(0x7ff01234),
+        float32FromBits(0xfff01234),
     };
     for (int i=0; i < sizeof(vals) / sizeof(vals[0]); i++) {
         float32_t input = vals[i];
