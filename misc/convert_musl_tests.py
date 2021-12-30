@@ -3,6 +3,7 @@
 import argparse
 import enum
 import logging
+import os.path
 import re
 import sys
 import textwrap
@@ -138,6 +139,7 @@ class Testcase(NamedTuple):
     output: str
     err: str
     exc_flags: FloatExcFlag
+    comment: Optional[str]
 
     def to_row(self) -> Tuple[str, ...]:
         return (
@@ -148,6 +150,7 @@ class Testcase(NamedTuple):
             (" " if self.err[0] != "-" else "") + self.err + ",",
             str(self.exc_flags),
             "},",
+            "// " + self.comment if self.comment else "",
         )
 
 
@@ -167,7 +170,8 @@ def parse_line(
         rf"({hex_float_regex_all}),\s*"
         rf"({hex_float_regex_plus_zero}),\s*"
         rf"({exc_flag_regex_all})\s*"
-        rf"\)",
+        rf"\)\s*"
+        rf"(?://\s*(.+?)\s*)?",
         line,
     )
     if not match:
@@ -177,12 +181,14 @@ def parse_line(
     rounding_mode = getattr(RoundingMode, match.group(1))
     if rounding_mode not in rounding_modes:
         logging.debug("Skipping testcase with rounding mode %r", rounding_mode.name)
+        return None
     f_input = canonicalise_float(match.group(2), float_type)
     f_output = canonicalise_float(match.group(3), float_type)
     f_err = canonicalise_float(match.group(4), FloatType.F32)
     exc_flags = FloatExcFlag.from_str(match.group(5))
+    comment = match.group(6)
 
-    return Testcase(rounding_mode, f_input, f_output, f_err, exc_flags)
+    return Testcase(rounding_mode, f_input, f_output, f_err, exc_flags, comment)
 
 
 def parse_args(argv):
@@ -231,15 +237,56 @@ def main(argv) -> None:
 
     rounding_modes = RoundingMode.ALL if args.all else RoundingMode.RN
 
-    testcases = [tc.to_row() for L in lines if (tc := parse_line(L, float_type, rounding_modes))]
-    table = tabulate.tabulate(testcases, tablefmt="plain")
+    testcase_lines = {
+        i: tc.to_row()
+        for i, L in enumerate(lines)
+        if (tc := parse_line(L, float_type, rounding_modes))
+    }
+    table = tabulate.tabulate(testcase_lines.values(), tablefmt="plain")
+    table = re.sub(r" {2}(\S)", r" \1", table)  # Reduce space between columns
+    table_lines = iter(table.splitlines())
+    first_table_line_idx = list(testcase_lines)[0]
+
+    print(textwrap.dedent(f"""\
+        // This file has been automatically generated from the libc-test suite by
+        // the {os.path.basename(sys.argv[0])} script. Comments in the original file (including
+        // copyright) have all been kept intact.
+
+        const math = @import("../../math.zig");
+        const inf = math.inf({float_type.name.lower()});
+        const nan = math.nan({float_type.name.lower()});
+
+        // zig fmt: off
+
+        // TODO: Better handling for the exception bitfield and rounding mode enum.
+        const RN = 0x0;
+        const RD = 0x1;
+        const RU = 0x2;
+        const RZ = 0x3;
+
+        const NONE      = 0x00;
+        const INVALID   = 0x01;
+        const INEXACT   = 0x02;
+        const DIVBYZERO = 0x04;
+        const OVERFLOW  = 0x08;
+        const UNDERFLOW = 0x10;
+
+    """))
+    if first_table_line_idx > 0:
+        print("".join(lines[:first_table_line_idx]))
+        print()
     print("const testcases = .{")
-    print(
-        textwrap.indent(
-            re.sub(r" {2}(\S)", r" \1", table),  # Reduce space between columns
-            " " * 4,
-        )
-    )
+    for i, L in enumerate(lines[first_table_line_idx:], start=first_table_line_idx):
+        if i in testcase_lines:
+            print(" " * 4 + next(table_lines).rstrip())
+        elif parse_line(L, float_type, RoundingMode.ALL):
+            continue
+        else:
+            line = lines[i].strip()
+            if line:
+                print(" " * 4 + line)
+            else:
+                print()
     print("};")
 
 
