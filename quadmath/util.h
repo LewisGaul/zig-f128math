@@ -70,12 +70,4 @@ int parse_float_arg(const char *arg, args_t *out_args);
 void run_single_input_func(args_t input, single_input_funcs_t funcs);
 
 
-/*
- * Generic main function for a single-input math function.
- */
-int single_input_func_main(int argc,
-                           const char **argv,
-                           single_input_funcs_t funcs);
-
-
 #endif  // UTIL_H

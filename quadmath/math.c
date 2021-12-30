@@ -84,12 +84,11 @@ int
 main (int         argc,
       const char *argv[])
 {
-    int                  rc   = 0;
-    args_t               args = {};
+    int                  rc    = 0;
+    args_t               args  = {};
     single_input_funcs_t funcs = {};
 
     if (argc != 3) {
-        fprintf(stderr, "Expected usage: %s exp 0x7f80000\n", argv[0]);
         rc = 1;
     }
 
@@ -103,6 +102,16 @@ main (int         argc,
 
     if (rc == 0) {
         run_single_input_func(args, funcs);
+    } else {
+        fprintf(
+            stderr,
+            "Incorrect usage. Examples:\n"
+            "  %s exp 0x7f801234\n"
+            "  %s log2 0x1.fffffep+127\n"
+            "  %s log1p inf\n",
+            argv[0],
+            argv[0],
+            argv[0]);
     }
 
     return rc;

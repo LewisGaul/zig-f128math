@@ -10,89 +10,114 @@
 #include "util.h"
 
 
+/*
+ * See util.h
+ */
 int
 parse_float_arg (const char *arg,
                  args_t     *out_args)
 {
-    int      rc      = 0;
-    uint32_t arg_len = strlen(arg);
+    int       rc      = 0;
+    uint32_t  arg_len = strlen(arg);
+    char     *endptr  = NULL;
 
     // Set to zero as e.g. strol uses this to communicate success/failure.
     errno = 0;
 
-    if (strncmp(arg, "0x", 2) != 0) {
-        fprintf(stderr, "Expected input to start with '0x'\n");
-        rc = 1;
-    } else if (arg_len == 10) {
-        uint32_t val = (uint32_t)strtoul(arg, NULL, 16);
-        rc = errno;
-        if (rc == 0) {
-            out_args->float_size = FLOAT_32;
-            out_args->input.u32 = val;
-        }
-    } else if (arg_len == 18) {
-        uint64_t val = strtoul(arg, NULL, 16);
-        rc = errno;
-        if (rc == 0) {
-            out_args->float_size = FLOAT_64;
-            out_args->input.u64 = val;
-        }
-    } else if (arg_len == 34) {
-        uint64_t high_bits, low_bits;
-        char *argcpy = strdup(arg);
-        argcpy[18] = '\0';
-        high_bits = strtoul(argcpy, NULL, 16);
-        free(argcpy);
-        rc = errno;
-        if (rc == 0) {
-            low_bits = strtoul(&arg[18], NULL, 16);
+    uint32_t val = (uint32_t)strtoul(arg, NULL, 16);
+    rc = errno;
+
+    if (strncmp(arg, "0x", 2) == 0 && strchr(arg, 'p') == NULL && strchr(arg, 'P') == NULL) { // uint bits
+        if (arg_len == 10) {
+            uint32_t val = (uint32_t)strtoul(arg, &endptr, 16);
             rc = errno;
+            if (rc == 0 && *endptr != '\0') {
+                rc = 1;
+            }
+            if (rc == 0) {
+                out_args->float_size = FLOAT_32;
+                out_args->input.u32 = val;
+            }
+        } else if (arg_len == 18) {
+            uint64_t val = strtoul(arg, &endptr, 16);
+            rc = errno;
+            if (rc == 0 && *endptr != '\0') {
+                rc = 1;
+            }
+            if (rc == 0) {
+                out_args->float_size = FLOAT_64;
+                out_args->input.u64 = val;
+            }
+        } else if (arg_len == 34) {
+            uint64_t high_bits, low_bits;
+            char *argcpy = strdup(arg);
+            argcpy[18] = '\0';
+            high_bits = strtoul(argcpy, &endptr, 16);
+            free(argcpy);
+            rc = errno;
+            if (rc == 0 && *endptr != '\0') {
+                rc = 1;
+            }
+            if (rc == 0) {
+                low_bits = strtoul(&arg[18], &endptr, 16);
+                rc = errno;
+            }
+            if (rc == 0 && *endptr != '\0') {
+                rc = 1;
+            }
+            if (rc == 0) {
+                out_args->float_size = FLOAT_128;
+                out_args->input.u128 = ((uint128_t)high_bits << 64) + low_bits;
+            }
+        } else {
+            fprintf(stderr,
+                    "Unexpected input length %d - expected a 32, 64, or 128-bit hex int",
+                    arg_len);
+            rc = 1;
         }
-        if (rc == 0) {
-            out_args->float_size = FLOAT_128;
-            out_args->input.u128 = ((uint128_t)high_bits << 64) + low_bits;
+    } else { // Regular float, any format
+        bool is_hex = strncmp(arg, "0x", 2) || strncmp(arg, "-0x", 3);
+        if (is_hex && arg_len >= 11 && arg_len <= 16) {
+            float32_t val = strtof(arg, &endptr);
+            rc = errno;
+            if (rc == 0 && *endptr != '\0') {
+                rc = 1;
+            }
+            if (rc == 0) {
+                out_args->float_size = FLOAT_32;
+                out_args->input.f32 = val;
+            }
+        } else if (is_hex && arg_len >= 19 && arg_len <= 24) {
+            float64_t val = strtod(arg, &endptr);
+            rc = errno;
+            if (rc == 0 && *endptr != '\0') {
+                rc = 1;
+            }
+            if (rc == 0) {
+                out_args->float_size = FLOAT_64;
+                out_args->input.f64 = val;
+            }
+        } else if (is_hex && arg_len >= 34 && arg_len <= 40) {
+            float128_t val = strtoflt128(arg, &endptr);
+            rc = errno;
+            if (rc == 0 && *endptr != '\0') {
+                rc = 1;
+            }
+            if (rc == 0) {
+                out_args->float_size = FLOAT_128;
+                out_args->input.f128 = val;
+            }
+        } else { // Default to 64-bit
+            float64_t val = strtod(arg, &endptr);
+            rc = errno;
+            if (rc == 0 && *endptr != '\0') {
+                rc = 1;
+            }
+            if (rc == 0) {
+                out_args->float_size = FLOAT_64;
+                out_args->input.f64 = val;
+            }
         }
-    } else {
-        fprintf(stderr,
-                "Unexpected input length %d - expected a 32, 64, or 128-bit hex int",
-                // "Unexpected input length %d - expected a 32 or 64-bit hex int\n",
-                arg_len);
-        rc = 1;
-    }
-
-    return rc;
-}
-
-
-/*
- * Parse arguments.
- *
- * Argument: argc
- *   IN  - The input number of args.
- *
- * Argument: argv
- *   IN  - The input args array.
- *
- * Argument: out_args
- *   OUT - The parsed args.
- */
-static int
-parse_args (int          argc,
-            const char **argv,
-            args_t      *out_args)
-{
-    int rc = 0;
-
-    assert(out_args != NULL);
-
-    if (argc == 1) {
-        fprintf(stderr, "Expected an input argument\n");
-        rc = 1;
-    } else if (argc > 2) {
-        fprintf(stderr, "Expected exactly one input argument, got %d\n", argc - 1);
-        rc = 1;
-    } else {
-        rc = parse_float_arg(argv[1], out_args);
     }
 
     return rc;
@@ -157,25 +182,4 @@ run_single_input_func (args_t               args,
         assert(false);
         break;
     }
-}
-
-
-/*
- * See util.h
- */
-int
-single_input_func_main (int                    argc,
-                        const char           **argv,
-                        single_input_funcs_t   funcs)
-{
-    int    rc   = 0;
-    args_t args = {};
-
-    rc = parse_args(argc, argv, &args);
-
-    if (rc == 0) {
-        run_single_input_func(args, funcs);
-    }
-
-    return rc;
 }
