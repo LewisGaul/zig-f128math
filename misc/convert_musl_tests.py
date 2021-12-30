@@ -9,11 +9,6 @@ import sys
 import textwrap
 from typing import Optional, NamedTuple, Tuple
 
-import tabulate
-
-
-tabulate.PRESERVE_WHITESPACE = True
-
 
 class FloatType(enum.Enum):
     F16 = enum.auto()
@@ -242,10 +237,12 @@ def main(argv) -> None:
         for i, L in enumerate(lines)
         if (tc := parse_line(L, float_type, rounding_modes))
     }
-    table = tabulate.tabulate(testcase_lines.values(), tablefmt="plain")
-    table = re.sub(r" {2}(\S)", r" \1", table)  # Reduce space between columns
-    table_lines = iter(table.splitlines())
     first_table_line_idx = list(testcase_lines)[0]
+    col_widths = [
+        max(len(row[i]) for row in testcase_lines.values())
+        for i in range(len(list(testcase_lines.values())[0]))
+    ]
+    table_line_fmt = " ".join(f"{{:<{x}}}" for x in col_widths)
 
     print(textwrap.dedent(f"""\
         // This file has been automatically generated from the libc-test suite by
@@ -278,7 +275,7 @@ def main(argv) -> None:
     print("const testcases = .{")
     for i, L in enumerate(lines[first_table_line_idx:], start=first_table_line_idx):
         if i in testcase_lines:
-            print(" " * 4 + next(table_lines).rstrip())
+            print(" " * 4 + table_line_fmt.format(*testcase_lines[i]).strip())
         elif parse_line(L, float_type, RoundingMode.ALL):
             continue
         else:
