@@ -131,8 +131,9 @@ main ()
          0x1.0000000000001p+0,
          0x1.fffffffffffffp-1,
         // Special
-        float64FromBits(0x7ff0123400000000),
-        float64FromBits(0xfff0123400000000),
+        float64FromBits(0x7ff0123400000000), // sNaN
+        float64FromBits(0x7ff8123400000000), // qNaN
+        float64FromBits(0xfff8123400000000), // -qNaN
     };
     for (int i=0; i < sizeof(vals) / sizeof(vals[0]); i++) {
         float64_t input = vals[i];

@@ -108,8 +108,9 @@ main ()
         -0x1.000002p+0,
         -0x1.fffffep-1,
         // Special
-        float32FromBits(0x7ff01234),
-        float32FromBits(0xfff01234),
+        float32FromBits(0x7f801234), // sNaN
+        float32FromBits(0x7fc01234), // qNaN
+        float32FromBits(0xffc01234), // -qNaN
     };
     for (int i=0; i < sizeof(vals) / sizeof(vals[0]); i++) {
         float32_t input = vals[i];

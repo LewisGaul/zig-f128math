@@ -170,8 +170,9 @@ main ()
         -0x1.6232bdd7abcd2p+9,
         -0x1.6232bdd7abcd3p+9,
         // Special
-        float64FromBits(0x7ff0123400000000),
-        float64FromBits(0xfff0123400000000),
+        float64FromBits(0x7ff0123400000000), // sNaN
+        float64FromBits(0x7ff8123400000000), // qNaN
+        float64FromBits(0xfff8123400000000), // -qNaN
         // Failing cases
          0x1.17219p-20,
         -0x1.17219p-20,
