@@ -10,9 +10,9 @@
 #include "util.h"
 
 
-static int
-parse_one_arg (const char *arg,
-               args_t     *out_args)
+int
+parse_float_arg (const char *arg,
+                 args_t     *out_args)
 {
     int      rc      = 0;
     uint32_t arg_len = strlen(arg);
@@ -65,9 +65,18 @@ parse_one_arg (const char *arg,
 
 
 /*
- * See util.h
+ * Parse arguments.
+ *
+ * Argument: argc
+ *   IN  - The input number of args.
+ *
+ * Argument: argv
+ *   IN  - The input args array.
+ *
+ * Argument: out_args
+ *   OUT - The parsed args.
  */
-int
+static int
 parse_args (int          argc,
             const char **argv,
             args_t      *out_args)
@@ -83,7 +92,7 @@ parse_args (int          argc,
         fprintf(stderr, "Expected exactly one input argument, got %d\n", argc - 1);
         rc = 1;
     } else {
-        rc = parse_one_arg(argv[1], out_args);
+        rc = parse_float_arg(argv[1], out_args);
     }
 
     return rc;

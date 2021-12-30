@@ -44,18 +44,18 @@ typedef struct {
 
 
 /*
- * Parse arguments.
+ * Parse a single float argument.
  *
- * Argument: argc
- *   IN  - The input number of args.
- *
- * Argument: argv
- *   IN  - The input args array.
+ * Argument: arg
+ *   IN  - The input arg.
  *
  * Argument: out_args
  *   OUT - The parsed args.
+ *
+ * Return:
+ *   Return code.
  */
-int parse_args(int argc, const char **argv, args_t *out_args);
+int parse_float_arg(const char *arg, args_t *out_args);
 
 
 /*
